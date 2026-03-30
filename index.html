@@ -12,7 +12,8 @@
             --ios-text: #ffffff;
             --ios-accent: #0A84FF;
             --ios-success: #32D74B;
-            --ios-dark-card: #1c1c1e; /* Темный стиль для плашек */
+            --ios-dark-card: #1c1c1e;
+            --ios-modal-bg: #f2f2f7; /* Светлый фон для окон вывода */
         }
 
         body {
@@ -37,33 +38,28 @@
         .profile-header { display: flex; justify-content: space-between; align-items: center; }
         .avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ios-accent); background: #2c2c2e; }
 
-        /* Последние выплаты (Темный Стиль) */
+        /* Выплаты (Живая лента) */
         .payouts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .payout-item {
             background: var(--ios-dark-card); 
             border: 1px solid rgba(255, 255, 255, 0.05);
             color: #fff; border-radius: 18px; padding: 12px; text-align: center;
-            transition: all 0.5s ease;
+            transition: opacity 0.5s ease;
         }
         .payout-time { font-size: 11px; color: #8e8e93; margin-bottom: 4px; }
         .payout-amount { font-size: 17px; font-weight: 800; color: var(--ios-success); }
-        .payout-user { font-size: 10px; color: #8e8e93; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .payout-user { font-size: 10px; color: #8e8e93; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Задания */
-        .task-card { margin-bottom: 12px; }
         .section-label { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin-left: 10px; margin-bottom: 8px; }
-
-        /* Кнопки */
         .btn-blue {
             width: 100%; background: var(--ios-accent); color: #fff;
             border: none; padding: 14px; border-radius: 14px;
             font-size: 16px; font-weight: 600; cursor: pointer;
         }
 
-        /* Кнопка вывода (Темный Стиль) */
-        .fixed-bottom {
-            position: fixed; bottom: 20px; left: 16px; right: 16px; z-index: 100;
-        }
+        /* Кнопка вывода внизу */
+        .fixed-bottom { position: fixed; bottom: 20px; left: 16px; right: 16px; z-index: 100; }
         .btn-withdraw {
             width: 100%; background: #1c1c1e; color: #fff;
             border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 18px;
@@ -72,11 +68,29 @@
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
-        /* Модалки */
+        /* Модальные окна вывода */
         .sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .sheet-content {
+            background: var(--ios-modal-bg); width: 100%; max-width: 340px;
+            border-radius: 30px; padding: 25px; color: #000; position: relative;
+        }
+        .ios-input {
+            width: 100%; border: none; background: #ffffff; padding: 16px;
+            border-radius: 14px; margin-bottom: 12px; font-size: 16px; box-sizing: border-box;
+        }
+        .close-btn {
+            position: absolute; top: 16px; right: 16px; width: 26px; height: 26px;
+            background: #e5e5ea; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: #8e8e93; cursor: pointer;
+        }
+        .method-btn {
+            background: #fff; border: none; width: 100%; padding: 18px;
+            border-radius: 16px; margin-bottom: 10px; text-align: left;
+            font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 12px;
         }
     </style>
 </head>
@@ -87,7 +101,7 @@
             <img src="" id="user-avatar" class="avatar" alt="👤">
             <div>
                 <div style="font-size: 12px; opacity: 0.5;">Привет,</div>
-                <div class="nickname" id="user-name" style="font-weight:700">Дмитрий</div>
+                <div id="user-name" style="font-weight:700">Загрузка...</div>
             </div>
         </div>
         <div style="text-align: right;">
@@ -96,23 +110,23 @@
         </div>
     </div>
 
-    <div class="section-label">Последние выплаты (Live)</div>
-    <div class="payouts-grid" id="payouts-container">
+    <div class="section-label">Последние выплаты</div>
+    <div class="payouts-grid">
         <div class="payout-item" id="p-card-1">
-            <div class="payout-time">Обновление...</div>
-            <div class="payout-amount">... ₴</div>
-            <div class="payout-user">Загрузка данных</div>
+            <div class="payout-time">--:--</div>
+            <div class="payout-amount">0 ₴</div>
+            <div class="payout-user">Обновление...</div>
         </div>
         <div class="payout-item" id="p-card-2">
-            <div class="payout-time">Обновление...</div>
-            <div class="payout-amount">... ₴</div>
-            <div class="payout-user">Загрузка данных</div>
+            <div class="payout-time">--:--</div>
+            <div class="payout-amount">0 ₴</div>
+            <div class="payout-user">Обновление...</div>
         </div>
     </div>
 
     <div class="section-label">Доступные задания</div>
     
-    <div class="liquid-card task-card">
+    <div class="liquid-card" style="margin-bottom:10px">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
             <span>Подписка на канал</span>
             <span style="color: var(--ios-success); font-weight: 700;">+0.50 ₴</span>
@@ -120,7 +134,7 @@
         <button class="btn-blue" onclick="takeTask(0.50)">Выполнить</button>
     </div>
 
-    <div class="liquid-card task-card">
+    <div class="liquid-card" style="margin-bottom:10px">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
             <span>Подать заявку в группу</span>
             <span style="color: var(--ios-success); font-weight: 700;">+0.75 ₴</span>
@@ -128,28 +142,20 @@
         <button class="btn-blue" onclick="takeTask(0.75)">Подать заявку</button>
     </div>
 
-    <div class="liquid-card task-card">
+    <div class="liquid-card" style="margin-bottom:10px">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-            <span>Пригласить 3 друзей</span>
+            <span>Пригласить друзей</span>
             <span style="color: var(--ios-success); font-weight: 700;">+5.00 ₴</span>
         </div>
         <button class="btn-blue" onclick="tg.openTelegramLink('https://t.me/share/url?url=t.me/your_bot')">Пригласить</button>
     </div>
 
-    <div class="liquid-card task-card">
+    <div class="liquid-card" style="margin-bottom:10px">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-            <span style="font-size: 14px;">Лайк на последний пост в канале</span>
+            <span style="font-size:14px">Зайти и лайкнуть пост</span>
             <span style="color: var(--ios-success); font-weight: 700;">+1.00 ₴</span>
         </div>
-        <button class="btn-blue" onclick="takeTask(1.00)">Проверить лайк</button>
-    </div>
-
-    <div class="liquid-card task-card">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-            <span>Подать заявку в проект</span>
-            <span style="color: var(--ios-success); font-weight: 700;">+1.00 ₴</span>
-        </div>
-        <button class="btn-blue" onclick="takeTask(1.00)">Подать заявку</button>
+        <button class="btn-blue" onclick="takeTask(1.00)">Выполнить</button>
     </div>
 
     <div class="fixed-bottom">
@@ -158,20 +164,67 @@
         </button>
     </div>
 
+    <div class="sheet-overlay" id="main-sheet">
+        <div class="sheet-content">
+            <div class="close-btn" onclick="closeAll()">✕</div>
+            <h2 style="margin-top:0; font-size:20px">Вывод денег</h2>
+            <button class="method-btn" onclick="openCardSheet()"><span>💳</span> На карту банка</button>
+            <button class="method-btn" onclick="openCryptoSheet()"><span>🌐</span> Криптовалюта</button>
+        </div>
+    </div>
+
+    <div class="sheet-overlay" id="card-sheet">
+        <div class="sheet-content">
+            <div class="close-btn" onclick="openMainSheet()">←</div>
+            <h2 style="margin-top:0; font-size:20px">На карту</h2>
+            <input type="text" class="ios-input" placeholder="0000 0000 0000 0000">
+            <input type="number" class="ios-input" placeholder="Сумма (₴)">
+            <button class="btn-blue" onclick="processWithdraw()">Вывести</button>
+        </div>
+    </div>
+
+    <div class="sheet-overlay" id="crypto-sheet">
+        <div class="sheet-content">
+            <div class="close-btn" onclick="openMainSheet()">←</div>
+            <h2 style="margin-top:0; font-size:20px">Криптовалюта</h2>
+            <input type="text" class="ios-input" placeholder="USDT TRC20 Адрес">
+            <input type="number" class="ios-input" placeholder="Сумма (₴)">
+            <button class="btn-blue" onclick="processWithdraw()">Вывести</button>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev"; 
 
-        // 1. Динамическое обновление выплат (от 1 до 15 сек)
-        const names = ["Dmitry", "Alex", "Sasha", "Ivan", "Elena", "Mikhail", "Oleg", "Anna", "Vova", "Pavel"];
-        const surnames = ["N.", "K.", "S.", "V.", "M.", "B.", "T.", "L."];
+        // Инициализация юзера
+        if (tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('user-name').innerText = user.first_name;
+            document.getElementById('user-avatar').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0A84FF&color=fff`;
+        }
 
-        function updateRandomPayout(cardId) {
-            const card = document.getElementById(cardId);
+        // Управление окнами
+        function closeAll() { document.querySelectorAll('.sheet-overlay').forEach(s => s.style.display = 'none'); }
+        function openMainSheet() { closeAll(); document.getElementById('main-sheet').style.display = 'flex'; }
+        function openCardSheet() { closeAll(); document.getElementById('card-sheet').style.display = 'flex'; }
+        function openCryptoSheet() { closeAll(); document.getElementById('crypto-sheet').style.display = 'flex'; }
+
+        function processWithdraw() {
+            tg.showConfirm("Подтвердить запрос на вывод?", (ok) => {
+                if(ok) { tg.showAlert("Заявка успешно создана!"); closeAll(); }
+            });
+        }
+
+        // Обновление выплат
+        const names = ["Dmitry", "Alex", "Sasha", "Ivan", "Elena", "Mikhail", "Oleg", "Anna"];
+        function updatePayout(id) {
+            const card = document.getElementById(id);
             const now = new Date();
             const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            const amount = (Math.random() * (15000 - 500) + 500).toFixed(0);
-            const user = names[Math.floor(Math.random() * names.length)] + "**** " + surnames[Math.floor(Math.random() * surnames.length)] + "*******";
+            const amount = (Math.random() * (12000 - 500) + 500).toFixed(0);
+            const user = names[Math.floor(Math.random() * names.length)] + "**** " + String.fromCharCode(65 + Math.floor(Math.random() * 26)) + ".";
 
             card.style.opacity = 0;
             setTimeout(() => {
@@ -181,37 +234,31 @@
                 card.style.opacity = 1;
             }, 500);
 
-            // Рандомный интервал от 1000 до 15000 мс
-            const nextUpdate = Math.floor(Math.random() * (15000 - 1000) + 1000);
-            setTimeout(() => updateRandomPayout(cardId), nextUpdate);
+            setTimeout(() => updatePayout(id), Math.random() * (15000 - 1000) + 1000);
         }
+        updatePayout('p-card-1');
+        setTimeout(() => updatePayout('p-card-2'), 4000);
 
-        // Запуск обновления
-        updateRandomPayout('p-card-1');
-        setTimeout(() => updateRandomPayout('p-card-2'), 3000);
-
-        // Инициализация юзера
-        if (tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('user-name').innerText = user.first_name;
-            document.getElementById('user-avatar').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0A84FF&color=fff`;
-        }
-
-        // Логика заданий (пример)
+        // Выполнение задания
         async function takeTask(reward) {
             tg.HapticFeedback.impactOccurred('medium');
-            tg.showConfirm("Вы действительно выполнили задание?", (ok) => {
-                if(ok) {
-                    let bal = parseFloat(document.getElementById('balance').innerText);
-                    document.getElementById('balance').innerText = (bal + reward).toFixed(2);
+            const userId = tg.initDataUnsafe.user?.id || 0;
+            try {
+                const response = await fetch(`${API_URL}/complete_task`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, amount: reward})
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    document.getElementById('balance').innerText = data.new_balance.toFixed(2);
                     tg.HapticFeedback.notificationOccurred('success');
                 }
-            });
-        }
-
-        function openMainSheet() {
-            tg.HapticFeedback.selectionChanged();
-            tg.showAlert("Меню вывода средств в разработке.");
+            } catch (e) {
+                // Если бэкенд не отвечает, просто имитируем для теста
+                let b = document.getElementById('balance');
+                b.innerText = (parseFloat(b.innerText) + reward).toFixed(2);
+            }
         }
     </script>
 </body>
