@@ -9,8 +9,8 @@
 
     <style>
         /* ========================================
-        1. CSS VARIABLES & THEMING
-        ========================================
+           1. ДИЗАЙН-СИСТЕМА (ПЕРЕМЕННЫЕ)
+           ========================================
         */
         :root {
             --bg-deep: #000000;
@@ -34,11 +34,14 @@
             
             --anim-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
             --anim-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --grad-blue: linear-gradient(135deg, #0A84FF, #5AC8FA);
+            --grad-gold: linear-gradient(135deg, #FF9500, #FFD60A);
         }
 
         /* ========================================
-        2. RESET & BASE STYLES
-        ========================================
+           2. БАЗОВЫЕ СТИЛИ И СБРОС
+           ========================================
         */
         * {
             margin: 0; padding: 0;
@@ -51,371 +54,313 @@
         body {
             background-color: var(--bg-deep);
             color: var(--text-primary);
-            overflow: hidden; /* Контент скроллится внутри контейнеров */
+            overflow: hidden;
             width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Ambient Background */
+        /* Живой фон */
         .ambient-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; pointer-events: none;
             background: 
-                radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(50, 215, 75, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 1) 0%, #000 100%);
+                radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(255, 149, 0, 0.1) 0%, transparent 40%),
+                #000;
         }
 
         /* ========================================
-        3. TYPOGRAPHY
-        ========================================
-        */
-        h1 { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
-        h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-        .label-small { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
-
-        /* ========================================
-        4. LAYOUT COMPONENTS
-        ========================================
+           3. КОМПОНЕНТЫ ИНТЕРФЕЙСА (SPA)
+           ========================================
         */
         .app-shell {
             flex: 1;
             position: relative;
             overflow-y: auto;
             padding: calc(20px + var(--safe-area-top)) 16px 120px 16px;
+            scroll-behavior: smooth;
         }
 
         .view {
             display: none;
-            animation: viewFadeIn 0.4s var(--anim-smooth);
+            animation: viewFadeIn 0.5s var(--anim-smooth);
         }
 
         .view.active { display: block; }
 
         @keyframes viewFadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ========================================
-        5. LIQUID GLASS CARDS
-        ========================================
-        */
+        /* Карточки Liquid Glass */
         .card {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 28px;
             padding: 20px;
             margin-bottom: 16px;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        .card::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: var(--grad-glass); pointer-events: none;
-        }
-
-        /* Task Specific Cards */
-        .card-premium { border: 1px solid rgba(10, 132, 255, 0.3); background: rgba(10, 132, 255, 0.05); }
-        .card-ultra { border: 1px solid rgba(255, 214, 10, 0.3); background: rgba(255, 214, 10, 0.03); }
 
         /* ========================================
-        6. USER PROFILE & BALANCE
-        ========================================
+           4. ШАПКА И ПРОФИЛЬ
+           ========================================
         */
         .profile-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
         }
 
         .user-block { display: flex; align-items: center; gap: 14px; }
         .avatar-wrapper {
-            width: 52px; height: 52px; border-radius: 50%;
+            width: 54px; height: 54px; border-radius: 50%;
             padding: 2px; background: var(--grad-blue);
+            box-shadow: 0 0 15px rgba(10, 132, 255, 0.3);
         }
         .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #000; }
 
         .balance-block { text-align: right; }
-        .balance-amount { font-size: 28px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-        .currency-symbol { color: var(--accent-blue); }
+        .balance-amount { font-size: 30px; font-weight: 900; color: var(--text-primary); }
+        .label-small { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px; }
 
         /* ========================================
-        7. TASKS UI
-        ========================================
+           5. СПИСОК ЗАДАНИЙ (6 КНОПОК)
+           ========================================
         */
-        .task-list-container { display: flex; flex-direction: column; gap: 12px; }
-
-        .task-item {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-
+        .task-item { display: flex; flex-direction: column; gap: 18px; }
         .task-top { display: flex; align-items: center; justify-content: space-between; }
-        .task-main { display: flex; align-items: center; gap: 14px; }
+        .task-info { display: flex; align-items: center; gap: 14px; }
         
-        .task-icon-container {
-            width: 52px; height: 52px; border-radius: 16px;
-            background: #1c1c1e; display: flex; align-items: center; justify-content: center;
+        .task-icon-box {
+            width: 50px; height: 50px; border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--glass-border);
         }
-        .task-icon-container img { width: 32px; height: 32px; object-fit: contain; }
+        .task-icon-box img { width: 30px; height: 30px; object-fit: contain; }
 
-        .task-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
-        .task-reward { font-size: 14px; font-weight: 600; color: var(--accent-green); }
-        .task-progress-text { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .task-title { font-size: 16px; font-weight: 700; }
+        .task-reward { font-size: 14px; font-weight: 600; color: var(--accent-green); margin-top: 2px; }
 
         /* ========================================
-        8. BUTTONS ENGINE
-        ========================================
+           6. КНОПКИ (ENGINE)
+           ========================================
         */
         .btn {
             width: 100%; border: none; outline: none;
             padding: 16px; border-radius: 18px;
             font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s var(--anim-bounce);
+            cursor: pointer; transition: all 0.25s var(--anim-bounce);
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        .btn:active { transform: scale(0.95); opacity: 0.9; }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
 
-        .btn-blue { background: var(--accent-blue); color: white; }
-        
-        .btn-premium { 
-            background: linear-gradient(135deg, #0A84FF 0%, #5AC8FA 100%);
-            color: white; box-shadow: 0 8px 20px rgba(10, 132, 255, 0.3);
-        }
-
-        .btn-gold {
-            background: linear-gradient(135deg, #FF9500 0%, #FFCC00 100%);
-            color: #000; box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
-        }
-
-        .btn-disabled { background: #2c2c2e; color: #8e8e93; cursor: not-allowed; }
+        .btn-blue { background: var(--accent-blue); color: #fff; }
+        .btn-premium { background: var(--grad-blue); color: #fff; box-shadow: 0 8px 25px rgba(10, 132, 255, 0.3); }
+        .btn-gold { background: var(--grad-gold); color: #000; box-shadow: 0 8px 25px rgba(255, 149, 0, 0.3); }
+        .btn-disabled { background: #2c2c2e; color: #8e8e93; cursor: not-allowed; pointer-events: none; }
 
         /* ========================================
-        9. SKELETON LOADERS
-        ========================================
-        */
-        .skeleton {
-            background: linear-gradient(90deg, #1c1c1e 25%, #2c2c2e 50%, #1c1c1e 75%);
-            background-size: 200% 100%;
-            animation: skeletonAnimate 1.5s infinite linear;
-        }
-
-        @keyframes skeletonAnimate {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* ========================================
-        10. BOTTOM NAVIGATION
-        ========================================
+           7. ТАБ-БАР (НИЖНЯЯ НАВИГАЦИЯ)
+           ========================================
         */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             height: calc(85px + var(--safe-area-bottom));
-            background: rgba(20, 20, 20, 0.85);
+            background: rgba(15, 15, 15, 0.85);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border-top: 0.5px solid rgba(255, 255, 255, 0.1);
             display: flex; justify-content: space-around;
-            padding: 10px 20px calc(10px + var(--safe-area-bottom)) 20px;
+            padding: 10px 10px calc(10px + var(--safe-area-bottom)) 10px;
             z-index: 1000;
         }
 
         .tab-item {
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            color: var(--text-secondary); text-decoration: none; transition: 0.2s;
-            width: 20%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--text-secondary); text-decoration: none; transition: 0.3s;
+            flex: 1; gap: 4px;
         }
 
         .tab-item.active { color: var(--accent-blue); }
-
-        .tab-icon { font-size: 24px; }
+        .tab-icon { font-size: 22px; }
         .tab-label { font-size: 10px; font-weight: 600; }
 
         /* ========================================
-        11. NOTIFICATIONS (TOASTS)
-        ========================================
+           8. УВЕДОМЛЕНИЯ (TOASTS)
+           ========================================
         */
-        #notification-center {
+        #toast-manager {
             position: fixed; top: calc(20px + var(--safe-area-top)); left: 16px; right: 16px;
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
-            pointer-events: none;
+            z-index: 9999; pointer-events: none;
         }
 
         .toast {
             background: rgba(255, 255, 255, 0.95); color: #000;
-            padding: 14px 20px; border-radius: 20px;
-            font-weight: 700; font-size: 14px;
+            padding: 14px 20px; border-radius: 20px; font-weight: 700;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 10px;
-            transform: translateY(-100px); opacity: 0;
+            margin-bottom: 10px; transform: translateY(-100px); opacity: 0;
             transition: all 0.5s var(--anim-bounce);
+            display: flex; align-items: center; gap: 12px;
         }
 
         .toast.show { transform: translateY(0); opacity: 1; }
 
         /* ========================================
-        12. WALLET SECTION
-        ========================================
-        */
-        .wallet-stats {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05); border-radius: 20px;
-            padding: 16px;
-        }
-
-        .stat-value { font-size: 18px; font-weight: 800; margin-top: 4px; }
-
-        /* ========================================
-        13. ANIMATIONS & REFINEMENTS
-        ========================================
+           9. СПЕЦИАЛЬНЫЕ ЭФФЕКТЫ
+           ========================================
         */
         .pulse-premium { animation: pulseBlue 2s infinite; }
         @keyframes pulseBlue {
-            0% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(10, 132, 255, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(10, 132, 255, 0); }
             100% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0); }
         }
+
+        .skeleton {
+            background: linear-gradient(90deg, #1c1c1e 25%, #2c2c2e 50%, #1c1c1e 75%);
+            background-size: 200% 100%;
+            animation: skeleton-move 1.5s infinite;
+        }
+        @keyframes skeleton-move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     </style>
 </head>
 <body>
 
     <div class="ambient-layer"></div>
-    <div id="notification-center"></div>
+    <div id="toast-manager"></div>
 
-    <div class="app-shell">
+    <div class="app-shell" id="scroll-container">
 
-        <div id="view-main" class="view active">
+        <div id="view-home" class="view active">
             <header class="profile-header">
                 <div class="user-block">
                     <div class="avatar-wrapper">
                         <img src="" id="user-avatar" alt="User">
                     </div>
                     <div>
-                        <div class="label-small">Приятно видеть вас,</div>
+                        <div class="label-small">Добро пожаловать,</div>
                         <h2 id="user-name">Загрузка...</h2>
                     </div>
                 </div>
                 <div class="balance-block">
                     <div class="label-small">БАЛАНС</div>
-                    <div class="balance-amount"><span id="balance">0.00</span> <span class="currency-symbol">₴</span></div>
+                    <div class="balance-amount"><span id="balance">0.00</span> <span style="color:var(--accent-blue)">₴</span></div>
                 </div>
             </header>
 
-            <div class="card" style="background: var(--grad-blue); border: none;">
-                <h2 style="margin-bottom: 8px;">Зарабатывай на простых заданиях</h2>
-                <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Подписки, лайки и приглашения — всё в одном месте с моментальными выплатами.</p>
-                <button class="btn" style="background: #fff; color: var(--accent-blue);" onclick="switchTab('tasks')">Начать работу</button>
+            <div class="card" style="background: var(--grad-blue); border: none; padding: 25px;">
+                <h1 style="font-size: 28px; margin-bottom: 10px;">Зарабатывай сейчас</h1>
+                <p style="opacity: 0.9; font-size: 14px; margin-bottom: 20px;">Выполняй задания и приглашай друзей. Самые высокие выплаты в Telegram!</p>
+                <button class="btn" style="background: #fff; color: var(--accent-blue);" onclick="switchTab('tasks')">Открыть задания</button>
             </div>
 
-            <div class="label-small" style="margin: 30px 0 15px 10px;">Статистика сети</div>
-            <div class="wallet-stats">
-                <div class="stat-item">
-                    <div class="label-small">Выплачено</div>
-                    <div class="stat-value" style="color: var(--accent-green);">145,200 ₴</div>
+            <div class="label-small" style="margin: 30px 0 15px 10px;">Твоя статистика</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="card" style="margin-bottom:0; padding: 15px;">
+                    <div class="label-small">Заданий</div>
+                    <div style="font-size: 20px; font-weight: 800; margin-top: 5px;">0</div>
                 </div>
-                <div class="stat-item">
-                    <div class="label-small">Пользователей</div>
-                    <div class="stat-value">12,408</div>
+                <div class="card" style="margin-bottom:0; padding: 15px;">
+                    <div class="label-small">Друзей</div>
+                    <div style="font-size: 20px; font-weight: 800; margin-top: 5px;" id="ref-count">0</div>
                 </div>
             </div>
         </div>
 
         <div id="view-tasks" class="view">
-            <h1>Задания</h1>
-            <p style="color: var(--text-secondary); margin-bottom: 24px;">Выполняй задания и получай награды на баланс.</p>
+            <h1 style="margin-bottom: 8px;">Задания</h1>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 25px;">Обновляются каждые 24 часа</p>
 
             <div class="task-list-container">
                 
                 <div class="card task-item">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container"><img src="subscribe_bell.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box"><img src="subscribe_bell.png"></div>
                             <div>
                                 <div class="task-title">Подписка на канал</div>
                                 <div class="task-reward">+0.50 ₴</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="processTask(0.5, 'Подписка')">Подписаться</button>
+                    <button class="btn btn-blue" onclick="executeStandardTask(0.5, 'Подписка')">Подписаться</button>
                 </div>
 
                 <div class="card task-item">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container"><img src="like_button.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box"><img src="like_button.png"></div>
                             <div>
                                 <div class="task-title">Поставить лайк</div>
                                 <div class="task-reward">+0.25 ₴</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="processTask(0.25, 'Лайк')">Выполнить</button>
+                    <button class="btn btn-blue" onclick="executeStandardTask(0.25, 'Лайк')">Выполнить</button>
                 </div>
 
                 <div class="card task-item">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container"><img src="ad_play_button.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box"><img src="ad_play_button.png"></div>
                             <div>
                                 <div class="task-title">Просмотр рекламы</div>
                                 <div class="task-reward">+1.00 ₴</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="handleAdClick()">Смотреть</button>
+                    <button class="btn btn-blue" onclick="simulateAd()">Смотреть видео</button>
                 </div>
 
-                <div class="card card-premium task-item">
+                <div class="card task-item" style="border: 1px solid rgba(10, 132, 255, 0.4);">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container" style="background: rgba(10,132,255,0.2);"><img src="invite_friends_links.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box" style="background: rgba(10,132,255,0.15)"><img src="invite_friends_links.png"></div>
                             <div>
-                                <div class="task-title">Пригласить 3 друзей</div>
+                                <div class="task-title">Пригласить 3 друга</div>
                                 <div class="task-reward">+15.00 ₴</div>
-                                <div class="task-progress-text">Прогресс: 0 / 3</div>
+                                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">Прогресс: 0 / 3</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-premium pulse-premium" onclick="inviteFriends()">Пригласить</button>
+                    <button class="btn btn-premium pulse-premium" onclick="shareRefLink()">Пригласить</button>
                 </div>
 
                 <div class="card task-item">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container"><img src="subscribe_bell.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box"><img src="subscribe_bell.png"></div>
                             <div>
-                                <div class="task-title">Подать заявку</div>
+                                <div class="task-title">Подать заявку в группу</div>
                                 <div class="task-reward">+2.00 ₴</div>
+                                <div style="font-size:11px; color:var(--accent-blue); font-weight:700" id="join-status">Нужна проверка</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="processTask(2.0, 'Заявка')">Подать заявку</button>
+                    <button class="btn btn-blue" id="join-btn" onclick="handleJoinRequestTask()">Подать заявку</button>
                 </div>
 
-                <div class="card card-ultra task-item">
+                <div class="card task-item" style="border: 1px solid rgba(255, 214, 10, 0.4);">
                     <div class="task-top">
-                        <div class="task-main">
-                            <div class="task-icon-container" style="background: rgba(255,214,10,0.2);"><img src="invite_friends_links.png"></div>
+                        <div class="task-info">
+                            <div class="task-icon-box" style="background: rgba(255,214,10,0.15)"><img src="invite_friends_links.png"></div>
                             <div>
-                                <div class="task-title" style="color: var(--accent-gold);">Мастер-партнер</div>
-                                <div class="task-reward" style="color: var(--accent-gold);">+100.00 ₴</div>
-                                <div class="task-progress-text">Прогресс: 0 / 10</div>
+                                <div class="task-title" style="color:var(--accent-gold)">Мастер-инвайтер</div>
+                                <div class="task-reward" style="color:var(--accent-gold)">+100.00 ₴</div>
+                                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">Цель: 10 друзей</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-gold" onclick="inviteFriends()">Собрать команду</button>
+                    <button class="btn btn-gold" onclick="shareRefLink()">Выполнить цель</button>
                 </div>
 
             </div>
@@ -423,18 +368,18 @@
 
         <div id="view-wallet" class="view">
             <h1>Кошелек</h1>
-            <p style="color: var(--text-secondary); margin-bottom: 24px;">Управляйте своими средствами и заказывайте выплаты.</p>
+            <p style="color: var(--text-secondary); margin-bottom: 25px;">Минимальный вывод: 100.00 ₴</p>
 
             <div class="card" style="text-align: center; padding: 40px 20px;">
-                <div class="label-small">ДОСТУПНО ДЛЯ ВЫВОДА</div>
-                <div style="font-size: 48px; font-weight: 900; margin: 10px 0;"><span id="wallet-balance">0.00</span> ₴</div>
-                <button class="btn btn-blue" style="margin-top: 20px;" onclick="requestWithdraw()">Вывести на карту / Крипто</button>
+                <div class="label-small">ДОСТУПНО К ВЫВОДУ</div>
+                <div style="font-size: 44px; font-weight: 900; margin: 15px 0;"><span id="wallet-balance">0.00</span> ₴</div>
+                <button class="btn btn-blue" onclick="requestWithdrawal()">Вывести деньги</button>
             </div>
 
-            <div class="label-small" style="margin-left: 10px; margin-bottom: 12px;">История операций</div>
-            <div id="history-container">
-                <div class="card" style="padding: 15px; display: flex; justify-content: space-between; align-items: center; opacity: 0.5;">
-                    <span style="font-size: 14px;">История пока пуста...</span>
+            <div class="label-small" style="margin: 20px 0 10px 10px;">История транзакций</div>
+            <div id="history-list">
+                <div class="card" style="padding: 15px; opacity: 0.5; text-align: center; font-size: 14px;">
+                    Здесь будут ваши выплаты...
                 </div>
             </div>
         </div>
@@ -442,32 +387,32 @@
     </div>
 
     <nav class="tab-bar">
-        <a href="javascript:void(0)" class="tab-item active" onclick="switchTab('main', this)">
+        <div class="tab-item active" onclick="switchTab('home', this)">
             <span class="tab-icon">🏠</span>
             <span class="tab-label">Главная</span>
-        </a>
-        <a href="javascript:void(0)" class="tab-item" onclick="switchTab('tasks', this)">
+        </div>
+        <div class="tab-item" onclick="switchTab('tasks', this)">
             <span class="tab-icon">🎯</span>
             <span class="tab-label">Задания</span>
-        </a>
-        <a href="javascript:void(0)" class="tab-item" onclick="switchTab('wallet', this)">
+        </div>
+        <div class="tab-item" onclick="switchTab('wallet', this)">
             <span class="tab-icon">💳</span>
             <span class="tab-label">Кошелек</span>
-        </a>
+        </div>
     </nav>
 
     <script>
         /**
-         * INITIALIZATION & GLOBALS
+         * 1. ИНИЦИАЛИЗАЦИЯ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
          */
         const tg = window.Telegram.WebApp;
-        const API_URL = "https://ВАШ-URL-NGROK.ngrok-free.dev"; // ЗАМЕНИТЬ НА СВОЙ
+        const API_URL = "https://ТВОЙ-NGROK.ngrok-free.dev"; // ЗАМЕНИ НА СВОЙ URL
         
-        let currentUser = {
+        let userState = {
             id: 0,
             balance: 0.00,
-            referrals: 0,
-            firstName: "Пользователь"
+            isJoinChecked: false,
+            firstName: "User"
         };
 
         // Настройка Telegram WebApp
@@ -477,40 +422,43 @@
         tg.backgroundColor = "#000000";
 
         /**
-         * UI ENGINE
+         * 2. UI ENGINE (ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК)
          */
-        function switchTab(viewId, el) {
-            // Виброотклик
+        function switchTab(viewId, element) {
             tg.HapticFeedback.impactOccurred('light');
 
-            // Смена активного вида
+            // Скрываем все виды
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            // Показываем нужный
             document.getElementById(`view-${viewId}`).classList.add('active');
 
-            // Смена активной иконки в таббаре
-            if (el) {
+            // Обновляем иконки в таббаре
+            if (element) {
                 document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-                el.classList.add('active');
+                element.classList.add('active');
             }
             
-            // Прокрутка наверх
-            document.querySelector('.app-shell').scrollTop = 0;
+            // Прокрутка контейнера вверх
+            document.getElementById('scroll-container').scrollTop = 0;
         }
 
-        function createToast(message, type = 'success') {
-            const container = document.getElementById('notification-center');
+        /**
+         * 3. СИСТЕМА УВЕДОМЛЕНИЙ (TOASTS)
+         */
+        function showToast(message, type = 'success') {
+            const manager = document.getElementById('toast-manager');
             const toast = document.createElement('div');
             toast.className = 'toast';
             
             const icon = type === 'success' ? '✅' : '⚠️';
             toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
             
-            container.appendChild(toast);
+            manager.appendChild(toast);
             
-            // Анимация появления
+            // Анимация входа
             setTimeout(() => toast.classList.add('show'), 10);
             
-            // Удаление
+            // Удаление через 3 сек
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 500);
@@ -518,167 +466,206 @@
         }
 
         /**
-         * DATA ENGINE
+         * 4. СИНХРОНИЗАЦИЯ ДАННЫХ С СЕРВЕРОМ
          */
-        async function fetchUserData() {
+        async function syncData() {
             const user = tg.initDataUnsafe.user;
-            if (!user) return;
+            if (!user) {
+                console.error("Пользователь не найден через Telegram SDK");
+                return;
+            }
 
-            currentUser.id = user.id;
-            currentUser.firstName = user.first_name;
+            userState.id = user.id;
+            userState.firstName = user.first_name;
 
-            // Обновляем UI сразу (пре-лоад)
-            document.getElementById('user-name').innerText = user.first_name;
+            // Обновляем базовый UI
+            document.getElementById('user-name').innerText = user.first_name.toUpperCase();
             document.getElementById('user-avatar').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0A84FF&color=fff`;
 
             try {
                 const response = await fetch(`${API_URL}/get_balance`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: user.id,
-                        username: user.username || "no_user"
-                    })
+                    body: JSON.stringify({ user_id: user.id, username: user.username || "anon" })
                 });
                 
                 const data = await response.json();
                 if (data.status === 'success') {
-                    updateBalanceUI(data.balance);
+                    updateGlobalBalance(data.balance);
+                    document.getElementById('ref-count').innerText = data.referrals || 0;
                 }
             } catch (err) {
-                console.error("Fetch error:", err);
-                createToast("Проблемы со связью с сервером", "error");
+                showToast("Ошибка подключения к серверу", "error");
             }
         }
 
-        function updateBalanceUI(newBalance) {
-            const balanceEl = document.getElementById('balance');
-            const walletBalanceEl = document.getElementById('wallet-balance');
+        function updateGlobalBalance(newVal) {
+            const bDisplay = document.getElementById('balance');
+            const wDisplay = document.getElementById('wallet-balance');
             
-            // Плавная анимация чисел
-            animateNumbers(parseFloat(balanceEl.innerText), newBalance, balanceEl);
-            animateNumbers(parseFloat(walletBalanceEl.innerText), newBalance, walletBalanceEl);
+            animateNumberValue(parseFloat(bDisplay.innerText), newVal, bDisplay);
+            animateNumberValue(parseFloat(wDisplay.innerText), newVal, wDisplay);
             
-            currentUser.balance = newBalance;
+            userState.balance = newVal;
         }
 
-        function animateNumbers(start, end, element) {
+        function animateNumberValue(start, end, element) {
             let current = start;
-            const range = end - start;
-            const increment = range / 20;
-            const stepTime = 30;
+            const diff = end - start;
+            if (diff === 0) return;
             
+            const steps = 30;
+            const increment = diff / steps;
+            let counter = 0;
+
             const timer = setInterval(() => {
                 current += increment;
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                counter++;
+                element.innerText = current.toFixed(2);
+                
+                if (counter >= steps) {
                     element.innerText = end.toFixed(2);
                     clearInterval(timer);
-                } else {
-                    element.innerText = current.toFixed(2);
                 }
-            }, stepTime);
+            }, 20);
         }
 
         /**
-         * TASK HANDLERS
+         * 5. ОБРАБОТКА ЗАДАНИЙ
          */
-        async function processTask(amount, taskName) {
-            // Вибрация
+
+        // Стандартные задания (Лайк, Подписка)
+        async function executeStandardTask(amount, title) {
             tg.HapticFeedback.impactOccurred('medium');
-            
-            // Эмуляция проверки выполнения
-            createToast("Проверка выполнения...");
-            
+            showToast("Проверка задания...");
+
+            // Имитация задержки "проверки"
             setTimeout(async () => {
                 try {
                     const response = await fetch(`${API_URL}/complete_task`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            user_id: currentUser.id,
-                            amount: amount,
-                            task_name: taskName
-                        })
+                        body: JSON.stringify({ user_id: userState.id, amount: amount, task_name: title })
+                    });
+                    const res = await response.json();
+                    if (res.status === 'success') {
+                        updateGlobalBalance(res.new_balance);
+                        showToast(`Начислено +${amount} ₴`);
+                        tg.HapticFeedback.notificationOccurred('success');
+                        addHistoryRecord(title, amount);
+                    }
+                } catch (e) { showToast("Ошибка начисления", "error"); }
+            }, 1000);
+        }
+
+        // Реклама
+        function simulateAd() {
+            tg.HapticFeedback.impactOccurred('selection');
+            showToast("Загрузка видео...");
+            setTimeout(() => {
+                executeStandardTask(1.0, "Просмотр рекламы");
+            }, 3000);
+        }
+
+        // ПРАВКА: Логика "Подать заявку" с отслеживанием через API
+        async function handleJoinRequestTask() {
+            const btn = document.getElementById('join-btn');
+            
+            if (!userState.isJoinChecked) {
+                // Первый этап: отправляем в канал
+                tg.openTelegramLink('https://t.me/your_channel_name'); // ЗАМЕНИ НА СВОЙ
+                
+                btn.innerText = "Проверить вступление";
+                btn.classList.replace('btn-blue', 'btn-premium');
+                userState.isJoinChecked = true;
+                showToast("Вступите и нажмите 'Проверить'");
+            } else {
+                // Второй этап: проверка через Python API
+                tg.HapticFeedback.impactOccurred('medium');
+                btn.innerText = "Проверяем...";
+                
+                try {
+                    const response = await fetch(`${API_URL}/verify_join`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ user_id: userState.id })
                     });
                     
                     const data = await response.json();
                     if (data.status === 'success') {
-                        updateBalanceUI(data.new_balance);
-                        createToast(`Получено +${amount.toFixed(2)} ₴`);
+                        showToast("✅ Заявка подтверждена!");
                         tg.HapticFeedback.notificationOccurred('success');
-                        addHistoryItem(taskName, amount);
+                        btn.innerText = "Выполнено";
+                        btn.classList.add('btn-disabled');
+                        document.getElementById('join-status').innerText = "Выполнено";
+                        syncData();
+                    } else {
+                        tg.showAlert(data.message || "Вы еще не подали заявку");
+                        btn.innerText = "Проверить снова";
                     }
                 } catch (e) {
-                    createToast("Ошибка при начислении", "error");
+                    showToast("Ошибка сервера", "error");
+                    btn.innerText = "Проверить вступление";
                 }
-            }, 1500);
+            }
         }
 
-        function handleAdClick() {
-            tg.HapticFeedback.impactOccurred('light');
-            createToast("Подготовка видео-рекламы...");
-            // Симуляция просмотра 3 сек
-            setTimeout(() => {
-                processTask(1.0, "Просмотр видео");
-            }, 3000);
+        // Рефералы
+        function shareRefLink() {
+            tg.HapticFeedback.impactOccurred('medium');
+            const botUser = "your_bot_name"; // ЗАМЕНИ НА ИМЯ БОТА
+            const url = `https://t.me/share/url?url=t.me/${botUser}?start=${userState.id}&text=Привет! Получай деньги за простые задания в Liquid Bux!`;
+            tg.openTelegramLink(url);
         }
 
-        function inviteFriends() {
-            tg.HapticFeedback.impactOccurred('selection');
-            const shareUrl = `https://t.me/share/url?url=t.me/your_bot?start=${currentUser.id}&text=Привет! Начни зарабатывать в Telegram Mini App вместе со мной!`;
-            tg.openTelegramLink(shareUrl);
-        }
-
-        function requestWithdraw() {
-            if (currentUser.balance < 100) {
+        /**
+         * 6. КОШЕЛЕК И ВЫПЛАТЫ
+         */
+        function requestWithdrawal() {
+            if (userState.balance < 100) {
                 tg.showPopup({
-                    title: 'Недостаточно средств',
-                    message: `Минимальная сумма для вывода: 100.00 ₴. Вам не хватает ${(100 - currentUser.balance).toFixed(2)} ₴.`,
-                    buttons: [{type: 'ok'}]
+                    title: 'Упс!',
+                    message: `Для вывода нужно накопить 100.00 ₴. Вам осталось всего ${(100 - userState.balance).toFixed(2)} ₴`,
+                    buttons: [{type: 'ok', text: 'Понял'}]
                 });
             } else {
-                tg.showConfirm("Вы уверены, что хотите вывести средства?", (ok) => {
-                    if (ok) createToast("Заявка создана и будет обработана в течение 24ч");
+                tg.showConfirm("Вы хотите создать заявку на вывод?", (confirm) => {
+                    if (confirm) showToast("Заявка создана! Ожидайте выплату.");
                 });
             }
         }
 
-        function addHistoryItem(name, amount) {
-            const container = document.getElementById('history-container');
-            // Убираем заглушку если она есть
-            if (container.innerText.includes("пуста")) container.innerHTML = '';
+        function addHistoryRecord(name, sum) {
+            const list = document.getElementById('history-list');
+            if (list.innerText.includes("будут ваши")) list.innerHTML = '';
             
-            const item = document.createElement('div');
-            item.className = 'card';
-            item.style.padding = '15px';
-            item.style.display = 'flex';
-            item.style.justifyContent = 'space-between';
-            item.style.marginBottom = '10px';
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.padding = '12px 18px';
+            div.style.marginBottom = '10px';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
             
-            const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            item.innerHTML = `
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            div.innerHTML = `
                 <div>
-                    <div style="font-weight: 700; font-size: 14px;">${name}</div>
-                    <div style="font-size: 11px; color: var(--text-secondary);">${now}</div>
+                    <div style="font-weight:700; font-size:14px;">${name}</div>
+                    <div style="font-size:11px; color:var(--text-secondary)">${time}</div>
                 </div>
-                <div style="color: var(--accent-green); font-weight: 800;">+${amount.toFixed(2)} ₴</div>
+                <div style="color:var(--accent-green); font-weight:800;">+${sum.toFixed(2)}</div>
             `;
-            
-            container.prepend(item);
+            list.prepend(div);
         }
 
         /**
-         * STARTUP
+         * 7. СТАРТ ПРИЛОЖЕНИЯ
          */
-        window.addEventListener('load', () => {
-            fetchUserData();
-            
-            // Скрываем лоадер Telegram когда всё готово
+        window.onload = () => {
+            syncData();
             setTimeout(() => {
                 tg.ready();
-            }, 500);
-        });
+            }, 400);
+        };
 
     </script>
 </body>
