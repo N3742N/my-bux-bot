@@ -3,613 +3,617 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Liquid Bux Ultra Pro Max - Luxury Edition</title>
-    
+    <title>iOS Liquid Bux - Full Version</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
-        /* ================================================================
-           1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ОСНОВА ДИЗАЙНА (LIQUID SYSTEM)
-           ================================================================
-        */
+        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ОСНОВА --- */
         :root {
-            --bg-main: #000000;
-            --accent-blue: #0A84FF;
-            --accent-blue-rgb: 10, 132, 255;
-            --accent-green: #32D74B;
-            --accent-purple: #5856D6;
-            --accent-red: #FF453A;
-            --text-white: #FFFFFF;
-            --text-gray: #8E8E93;
-            
-            --card-bg: rgba(28, 28, 30, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-            
-            --modal-bg: #FFFFFF;
-            --modal-text: #000000;
-            --modal-step-bg: #F2F2F7;
-            
-            --anim-speed: 0.3s;
-            --anim-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
+            --ios-bg: #000000;
+            --ios-glass: rgba(28, 28, 30, 0.7);
+            --ios-glass-heavy: rgba(28, 28, 30, 0.95);
+            --ios-text: #ffffff;
+            --ios-accent: #0A84FF;
+            --ios-success: #32D74B;
+            --ios-error: #FF453A;
+            --ios-warning: #FF9500;
+            --ios-invite-accent: #FFCC00;
+            --ios-modal-bg: #1c1c1e;
+            --ios-card-bg: #1c1c1e;
+            --tab-inactive: #8e8e93;
         }
 
-        /* Обнуление стилей */
         * {
-            margin: 0; padding: 0;
             box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-white);
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            background-color: var(--ios-bg);
+            background-image: 
+                radial-gradient(circle at 50% -10%, #1c2c4c 0%, #000000 100%),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            color: var(--ios-text);
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
         }
 
-        /* ================================================================
-           2. ФОНОВЫЕ ЭФФЕКТЫ (AMBIENT LIGHT)
-           ================================================================
-        */
-        .ambient-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; pointer-events: none;
-            background: 
-                radial-gradient(circle at 0% 0%, rgba(10, 132, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(88, 86, 214, 0.1) 0%, transparent 50%);
-        }
-
-        /* ================================================================
-           3. ОСНОВНОЙ КОНТЕЙНЕР (SHELL) И НАВИГАЦИЯ
-           ================================================================
-        */
-        .app-content {
-            flex: 1;
-            position: relative;
-            overflow-y: auto;
-            padding: calc(20px + var(--safe-top)) 16px 120px 16px;
-            scroll-behavior: smooth;
-        }
-
-        .view {
-            display: none;
-            animation: viewAppear 0.5s var(--anim-bounce);
-        }
-
-        .view.active { display: block; }
-
-        @keyframes viewAppear {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* ================================================================
-           4. КОМПОНЕНТЫ: КАРТОЧКИ И КНОПКИ (ТВОЙ ПРЕЖНИЙ ИНТЕРФЕЙС)
-           ================================================================
-        */
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .card:active { transform: scale(0.98); opacity: 0.9; }
-
-        .task-row {
+        /* --- КОНТЕЙНЕРЫ И СТРУКТУРА --- */
+        .app-container {
+            padding: 20px 16px 120px 16px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
         }
 
-        .task-meta { display: flex; align-items: center; gap: 15px; }
-
-        /* ЭМОДЗИ ВМЕСТО ФОТО (ПРАВКА) */
-        .emoji-icon-wrapper {
-            width: 52px; height: 52px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 26px;
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .task-info h3 { font-size: 16px; font-weight: 700; color: #fff; }
-        .task-info p { font-size: 14px; color: var(--accent-green); font-weight: 600; margin-top: 2px; }
-
-        .btn-action {
-            background: var(--accent-blue);
-            color: #fff; border: none; outline: none;
-            padding: 10px 20px; border-radius: 14px;
-            font-weight: 700; font-size: 14px;
-            cursor: pointer; transition: 0.3s;
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
-        /* ================================================================
-           5. МОДАЛЬНОЕ ОКНО (НОВЫЙ БЛОК КАК НА СКРИНШОТЕ)
-           ================================================================
-        */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: none; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.open { display: flex; animation: modalSlide 0.4s var(--anim-bounce); }
-
-        @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(100px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .modal-window {
-            background: var(--modal-bg);
-            width: 100%; max-width: 360px;
-            border-radius: 35px;
-            padding: 30px 24px;
+        /* --- СТИЛИ КАРТОЧЕК И ЭЛЕМЕНТОВ --- */
+        .liquid-card {
+            background: var(--ios-glass);
+            backdrop-filter: blur(30px) saturate(190%);
+            -webkit-backdrop-filter: blur(30px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .profile-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .avatar-wrapper {
             position: relative;
-            color: #000;
+            width: 52px;
+            height: 52px;
         }
 
-        .modal-close-btn {
-            position: absolute; top: 20px; right: 20px;
-            width: 32px; height: 32px; border-radius: 50%;
-            background: #F2F2F7; border: none; font-size: 20px;
-            display: flex; align-items: center; justify-content: center;
-            color: #8E8E93; cursor: pointer;
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--ios-accent);
+            background: #2c2c2e;
         }
 
-        .modal-title {
-            font-size: 22px; font-weight: 800;
-            margin-bottom: 25px; padding-right: 35px;
+        .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--ios-success);
+            border: 2px solid var(--ios-bg);
+            border-radius: 50%;
+        }
+
+        .balance-display {
+            text-align: right;
+        }
+
+        .balance-value {
+            font-size: 26px;
+            font-weight: 800;
             letter-spacing: -0.5px;
+            color: #fff;
         }
 
-        /* Шаги выполнения */
-        .step-container { display: flex; gap: 16px; margin-bottom: 24px; }
-        .step-badge {
-            min-width: 32px; height: 32px; border-radius: 50%;
-            background: #E5EAF5; color: var(--accent-blue);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 15px;
-        }
-        .step-desc { font-size: 15px; font-weight: 500; line-height: 1.4; color: #1C1C1E; }
-
-        /* Кнопки в модальном окне */
-        .m-btn-go {
-            width: 100%; background: #5856D6; color: #fff;
-            border: none; padding: 18px; border-radius: 20px;
-            font-size: 18px; font-weight: 700; margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(88, 86, 214, 0.3);
-            transition: 0.3s;
+        /* --- МАСТЕР ИНВАЙТОВ (ЗОЛОТОЙ ДИЗАЙН) --- */
+        .invite-master-card {
+            background: linear-gradient(145deg, rgba(255, 204, 0, 0.15) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        .m-btn-check {
-            width: 100%; background: var(--accent-green); color: #fff;
-            border: none; padding: 18px; border-radius: 20px;
-            font-size: 18px; font-weight: 700; margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(50, 215, 75, 0.3);
-            transition: 0.3s;
+        .invite-master-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,204,0,0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
 
-        .m-reward-card {
-            background: #F2FAF5; border: 1.5px solid #E1F2E7;
-            border-radius: 18px; padding: 16px; text-align: center;
-            font-size: 16px; font-weight: 600;
-        }
-        .m-reward-card span { color: var(--accent-green); font-weight: 800; }
-
-        /* ================================================================
-           6. ШАПКА И ПРОФИЛЬ (ТВОЙ ДИЗАЙН)
-           ================================================================
-        */
-        .header-profile {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 35px;
+        .invite-badge {
+            background: var(--ios-invite-accent);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
 
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .user-avatar {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--accent-blue); border: 2px solid #fff;
-            display: flex; align-items: center; justify-content: center; font-weight: 800;
+        .btn-gold {
+            background: linear-gradient(135deg, #FF9500 0%, #FFCC00 100%);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+            transition: all 0.2s ease;
         }
 
-        .balance-label { font-size: 12px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
-        .balance-value { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+        .btn-gold:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+        }
 
-        /* ================================================================
-           7. ТАБ-БАР (НИЖНЯЯ ПАНЕЛЬ)
-           ================================================================
-        */
+        /* --- ЗАДАНИЯ --- */
+        .task-item {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .task-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-icon-box {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .btn-action {
+            background: var(--ios-accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* --- ТЕМНЫЕ МОДАЛЬНЫЕ ОКНА --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 2000;
+        }
+
+        .modal-sheet {
+            background: var(--ios-modal-bg);
+            width: 100%;
+            border-radius: 30px 30px 0 0;
+            padding: 32px 24px;
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .ios-input {
+            width: 100%;
+            background: #2c2c2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 18px;
+            border-radius: 16px;
+            color: white;
+            font-size: 17px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .ios-input:focus {
+            border-color: var(--ios-accent);
+        }
+
+        /* --- ВЫПЛАТЫ --- */
+        .payout-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .payout-card {
+            min-width: 150px;
+            background: #1c1c1e;
+            border-radius: 18px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- НАВИГАЦИЯ --- */
         .tab-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: calc(85px + var(--safe-bottom));
-            background: rgba(15, 15, 15, 0.9);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 85px;
+            background: var(--ios-glass-heavy);
             backdrop-filter: blur(25px);
-            border-top: 1px solid var(--card-border);
-            display: flex; justify-content: space-around;
-            padding: 10px 15px; z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            border-top: 0.5px solid rgba(255,255,255,0.1);
+            z-index: 1000;
         }
 
         .tab-item {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: var(--text-gray); gap: 5px; transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--tab-inactive);
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.2s;
         }
 
-        .tab-item.active { color: var(--accent-blue); }
-        .tab-item span:first-child { font-size: 22px; }
-        .tab-item span:last-child { font-size: 10px; font-weight: 700; text-transform: uppercase; }
-
-        /* ================================================================
-           8. TOAST NOTIFICATIONS (УВЕДОМЛЕНИЯ)
-           ================================================================
-        */
-        .toast-box {
-            position: fixed; top: 40px; left: 20px; right: 20px;
-            background: #fff; color: #000; padding: 16px 24px;
-            border-radius: 20px; font-weight: 700; z-index: 10000;
-            transform: translateY(-150px); transition: 0.5s var(--anim-bounce);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            display: flex; align-items: center; gap: 12px;
+        .tab-item.active {
+            color: var(--ios-accent);
         }
-        .toast-box.visible { transform: translateY(0); }
 
+        .tab-icon {
+            font-size: 24px;
+        }
+
+        /* Утилиты */
+        .section-title {
+            font-size: 13px;
+            color: #8e8e93;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-left: 8px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
-    <div id="toast" class="toast-box">✅ Награда зачислена!</div>
-
-    <div class="modal-overlay" id="modal-container">
-        <div class="modal-window">
-            <button class="modal-close-btn" onclick="closeTaskModal()">×</button>
-            <div class="modal-title" id="mt-title">Название задания</div>
-            
-            <div class="step-container">
-                <div class="step-badge">1</div>
-                <div class="step-desc" id="mt-step1">Текст первого шага из настроек задания.</div>
+<div class="app-container">
+    
+    <div id="page-home" class="page active">
+        <div class="liquid-card profile-section">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="avatar-wrapper">
+                    <img src="" id="user-avatar" class="avatar" alt="👤">
+                    <div class="online-dot"></div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; color: #8e8e93;">Привет,</div>
+                    <div id="user-name" style="font-size: 18px; font-weight: 700;">Пользователь</div>
+                </div>
             </div>
-            <button class="m-btn-go" id="mt-btn-go" onclick="redirectToTask()">Перейти</button>
-
-            <div class="step-container">
-                <div class="step-badge">2</div>
-                <div class="step-desc">После выполнения вернитесь и нажмите кнопку ниже для проверки.</div>
+            <div class="balance-display">
+                <div style="font-size: 11px; color: #8e8e93; font-weight: 700;">БАЛАНС</div>
+                <div class="balance-value"><span id="balance">0.00</span> ₴</div>
             </div>
-            <button class="m-btn-check" id="mt-btn-check" onclick="verifyTaskCompletion()">Проверить</button>
+        </div>
 
-            <div class="m-reward-card">
-                Награда: <span id="mt-reward">0.00 ₴</span>
+        <div class="section-title">Акции дня</div>
+        <div class="liquid-card" style="background: linear-gradient(135deg, #0A84FF 0%, #0056b3 100%); border: none;">
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 5px;">Выполняй задания!</div>
+            <div style="font-size: 14px; opacity: 0.9;">Бонус +15% к выплатам сегодня</div>
+            <div id="timer" style="margin-top: 15px; font-family: monospace; font-size: 18px; font-weight: 700;">00:00:00</div>
+        </div>
+
+        <div class="section-title">Последние выплаты</div>
+        <div class="payout-scroll" id="payout-list">
             </div>
+
+        <div class="section-title">Рекомендуем</div>
+        <div class="liquid-card invite-master-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <div class="invite-badge">Super Task</div>
+                    <div style="font-size: 20px; font-weight: 800; margin-top: 8px;">Мастер инвайтов (10)</div>
+                </div>
+                <div style="font-size: 22px; font-weight: 800; color: var(--ios-invite-accent);">+100 ₴</div>
+            </div>
+            <p style="font-size: 14px; color: #8e8e93; margin-bottom: 18px;">Пригласи 10 активных друзей и получи мгновенный бонус на баланс.</p>
+            <button class="btn-gold" onclick="openModal('modal-invite')">Собрать команду</button>
         </div>
     </div>
 
-    <div class="app-content" id="main-scroll">
-
-        <div id="view-home" class="view active">
-            <div class="header-profile">
-                <div class="user-info">
-                    <div class="user-avatar" id="u-avatar">?</div>
+    <div id="page-tasks" class="page">
+        <div class="section-title">Социальные сети</div>
+        <div class="liquid-card task-item">
+            <div class="task-info">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="task-icon-box">📢</div>
                     <div>
-                        <div class="balance-label">Привет, <span id="u-name">...</span></div>
-                        <div class="balance-value"><span id="balance-main">0.00</span> ₴</div>
+                        <div style="font-weight: 600;">Подписка на канал</div>
+                        <div style="font-size: 12px; color: var(--ios-success);">+0.50 ₴</div>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <div class="balance-label">Рейтинг</div>
-                    <div style="font-weight: 800; color: var(--accent-blue);">PRO</div>
-                </div>
-            </div>
-
-            <div class="card" style="background: linear-gradient(135deg, #0A84FF, #5856D6); border: none;">
-                <h2 style="font-size: 24px; margin-bottom: 8px;">Бонус 500 ₴</h2>
-                <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Пригласи 5 активных друзей и получи супер-бонус на счет!</p>
-                <button class="btn-action" style="background: #fff; color: #000; width: 100%; padding: 15px;" onclick="shareReferral()">Пригласить друзей</button>
-            </div>
-
-            <div class="balance-label" style="margin: 25px 0 15px 5px;">Твоя активность</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="card" style="margin-bottom:0; padding: 15px;">
-                    <div class="balance-label">Заданий</div>
-                    <div style="font-size: 20px; font-weight: 800; margin-top: 5px;">14</div>
-                </div>
-                <div class="card" style="margin-bottom:0; padding: 15px;">
-                    <div class="balance-label">Доход</div>
-                    <div style="font-size: 20px; font-weight: 800; margin-top: 5px;">+84.0</div>
-                </div>
+                <button class="btn-action" style="width: 100px;" onclick="takeTask(0.50)">Перейти</button>
             </div>
         </div>
 
-        <div id="view-tasks" class="view">
-            <h2 style="font-size: 28px; font-weight: 900; margin-bottom: 5px;">Задания</h2>
-            <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 25px;">Выполняй и получай мгновенную оплату</p>
-
-            <div class="task-container">
-                
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">📢</div>
-                            <div class="task-info">
-                                <h3>Подписка на канал</h3>
-                                <p>+0.50 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('sub')">Открыть</button>
+        <div class="liquid-card task-item">
+            <div class="task-info">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="task-icon-box">👥</div>
+                    <div>
+                        <div style="font-weight: 600;">Вступить в группу</div>
+                        <div style="font-size: 12px; color: var(--ios-success);">+0.75 ₴</div>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">❤️</div>
-                            <div class="task-info">
-                                <h3>Поставить лайк</h3>
-                                <p>+0.25 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('like')">Открыть</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">🎬</div>
-                            <div class="task-info">
-                                <h3>Смотреть рекламу</h3>
-                                <p>+1.00 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('ads')">Открыть</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">👥</div>
-                            <div class="task-info">
-                                <h3>Пригласить 3 друга</h3>
-                                <p>+15.00 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('ref3')">Открыть</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">📨</div>
-                            <div class="task-info">
-                                <h3>Подать заявку</h3>
-                                <p>+2.00 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('join')">Открыть</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="task-row">
-                        <div class="task-meta">
-                            <div class="emoji-icon-wrapper">💎</div>
-                            <div class="task-info">
-                                <h3>Мастер инвайтов (10)</h3>
-                                <p>+100.00 ₴</p>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="initiateTask('ref10')">Открыть</button>
-                    </div>
-                </div>
-
+                <button class="btn-action" style="width: 100px;" onclick="takeTask(0.75)">Вступить</button>
             </div>
         </div>
 
-        <div id="view-wallet" class="view">
-            <h2 style="margin-bottom: 25px;">Вывод средств</h2>
-            
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-                <div class="balance-label">ДОСТУПНО К ВЫПЛАТЕ</div>
-                <div class="balance-value" style="font-size: 48px; margin: 15px 0;"><span id="balance-wallet">0.00</span> ₴</div>
-                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-bottom: 30px; position: relative; overflow: hidden;">
-                    <div id="p-bar" style="position: absolute; left: 0; top: 0; height: 100%; background: var(--accent-blue); width: 0%; transition: 1s;"></div>
+        <div class="section-title">Активность</div>
+        <div class="liquid-card task-item">
+            <div class="task-info">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="task-icon-box">❤️</div>
+                    <div>
+                        <div style="font-weight: 600;">Поставить лайк</div>
+                        <div style="font-size: 12px; color: var(--ios-success);">+0.25 ₴</div>
+                    </div>
                 </div>
-                <button class="btn-action" style="width: 100%; padding: 18px; font-size: 16px;" onclick="requestPayout()">Вывести деньги</button>
-            </div>
-
-            <div class="card" style="border: 1px dashed var(--accent-blue); opacity: 0.8;">
-                <p style="font-size: 13px; text-align: center;">Минимальная сумма для вывода: <b>100.00 ₴</b>. <br> Выплаты обрабатываются в течение 24 часов.</p>
+                <button class="btn-action" style="width: 100px;" onclick="takeTask(0.25)">Открыть</button>
             </div>
         </div>
-
     </div>
 
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="navigate('home', this)">
-            <span>🏠</span><span>Главная</span>
+    <div id="page-wallet" class="page">
+        <div class="liquid-card" style="text-align: center; padding: 40px 20px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">💳</div>
+            <div style="font-size: 22px; font-weight: 800;">Доступно к выводу</div>
+            <div style="font-size: 32px; font-weight: 900; color: var(--ios-success); margin: 10px 0;"><span class="current-balance-wallet">0.00</span> ₴</div>
+            <p style="font-size: 13px; color: #8e8e93;">Минимальная сумма: 100 ₴</p>
         </div>
-        <div class="tab-item" onclick="navigate('tasks', this)">
-            <span>🎯</span><span>Задания</span>
-        </div>
-        <div class="tab-item" onclick="navigate('wallet', this)">
-            <span>💳</span><span>Вывод</span>
-        </div>
-    </nav>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        const SERVER_URL = "https://ТВОЙ_АДРЕС.ngrok-free.dev"; // ЗАМЕНИТЬ
+        <div class="section-title">Выберите способ</div>
+        <div class="liquid-card" onclick="openModal('modal-withdraw-card')" style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
+            <div style="font-size: 24px;">🏦</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600;">На карту банка</div>
+                <div style="font-size: 12px; color: #8e8e93;">Украина / СНГ</div>
+            </div>
+            <div style="color: #8e8e93;">→</div>
+        </div>
+
+        <div class="liquid-card" onclick="openModal('modal-withdraw-crypto')" style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
+            <div style="font-size: 24px;">🌐</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600;">Криптовалюта</div>
+                <div style="font-size: 12px; color: #8e8e93;">USDT TRC20 / TON</div>
+            </div>
+            <div style="color: #8e8e93;">→</div>
+        </div>
+    </div>
+
+</div>
+
+<nav class="tab-bar">
+    <a href="#" class="tab-item active" onclick="switchPage('home', this)">
+        <span class="tab-icon">🏠</span>
+        <span>Главная</span>
+    </a>
+    <a href="#" class="tab-item" onclick="switchPage('tasks', this)">
+        <span class="tab-icon">🎯</span>
+        <span>Задания</span>
+    </a>
+    <a href="#" class="tab-item" onclick="switchPage('wallet', this)">
+        <span class="tab-icon">💳</span>
+        <span>Вывод</span>
+    </a>
+</nav>
+
+<div class="modal-overlay" id="modal-invite" onclick="closeModal('modal-invite')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <span style="font-size: 40px;">💎</span>
+            <div>
+                <h2 style="margin: 0; font-size: 24px;">Мастер инвайтов</h2>
+                <div style="color: var(--ios-invite-accent); font-weight: 700;">Бонус +100.00 ₴</div>
+            </div>
+        </div>
+        <p style="color: #8e8e93; line-height: 1.6; margin-bottom: 25px;">
+            Ваша задача — собрать команду из <span style="color: #fff; font-weight: 700;">10 активных пользователей</span>. 
+            Как только 10-й друг выполнит хотя бы одно задание, бонус автоматически зачислится на ваш счет.
+        </p>
         
-        let appState = {
-            balance: 0.00,
-            activeTask: null,
-            userId: 0
-        };
+        <div class="section-title">Ваша ссылка</div>
+        <input type="text" class="ios-input" id="ref-link" value="https://t.me/your_bot?start=123456" readonly onclick="this.select()">
+        
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; margin-bottom: 25px; display: flex; justify-content: space-between;">
+            <span>Прогресс команды:</span>
+            <span style="font-weight: 800; color: var(--ios-invite-accent);">0 / 10</span>
+        </div>
 
-        // Данные для заданий (база данных фронтенда)
-        const TASKS_CONFIG = {
-            sub: { title: "Подписка на канал", step1: "Перейдите в канал по ссылке ниже и подпишитесь.", reward: "0.50 ₴", url: "https://t.me/your_channel", value: 0.5 },
-            like: { title: "Поставить лайк", step1: "Откройте пост и поставьте любую реакцию/лайк.", reward: "0.25 ₴", url: "https://t.me/your_post", value: 0.25 },
-            ads: { title: "Смотреть рекламу", step1: "Дождитесь окончания рекламного видеоролика.", reward: "1.00 ₴", url: "#", value: 1.0 },
-            ref3: { title: "Пригласить 3 друга", step1: "Ваши друзья должны перейти в бот по вашей ссылке.", reward: "15.00 ₴", url: "https://t.me/share/url", value: 15.0 },
-            join: { title: "Подать заявку", step1: "Подайте заявку на вступление в закрытую группу.", reward: "2.00 ₴", url: "https://t.me/your_group", value: 2.0 },
-            ref10: { title: "Мастер инвайтов", step1: "Пригласите 10 человек в нашу экосистему.", reward: "100.00 ₴", url: "https://t.me/share/url", value: 100.0 }
-        };
+        <button class="btn-gold" onclick="tg.openTelegramLink('https://t.me/share/url?url=https://t.me/your_bot')">Пригласить друга</button>
+        <button class="btn-action" style="background: transparent; color: #8e8e93; margin-top: 10px;" onclick="closeModal('modal-invite')">Закрыть</button>
+    </div>
+</div>
 
-        // Инициализация
-        window.onload = () => {
-            tg.expand();
-            tg.ready();
-            
-            const user = tg.initDataUnsafe.user;
-            if (user) {
-                appState.userId = user.id;
-                document.getElementById('u-name').innerText = user.first_name;
-                document.getElementById('u-avatar').innerText = user.first_name.charAt(0);
-                fetchUserData();
-            }
-        };
+<div class="modal-overlay" id="modal-withdraw-card" onclick="closeModal('modal-withdraw-card')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+        <h2 style="margin-top: 0;">Вывод на карту</h2>
+        <p style="color: #8e8e93; font-size: 14px; margin-bottom: 20px;">Средства поступают в течение 24 часов.</p>
+        
+        <input type="text" class="ios-input" placeholder="Номер карты (16 цифр)">
+        <input type="number" class="ios-input" placeholder="Сумма вывода (₴)">
+        
+        <div style="background: rgba(50, 215, 75, 0.1); padding: 12px; border-radius: 12px; color: var(--ios-success); font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span>✓</span> Выплата доступна 24/7 без оператора
+        </div>
 
-        // Навигация
-        function navigate(viewId, el) {
-            tg.HapticFeedback.impactOccurred('light');
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            
-            document.getElementById('main-scroll').scrollTop = 0;
-        }
+        <button class="btn-action" style="padding: 18px; font-size: 17px;" onclick="processWithdraw()">Подтвердить вывод</button>
+    </div>
+</div>
 
-        // РАБОТА С МОДАЛЬНЫМ ОКНОМ
-        function initiateTask(taskId) {
-            const task = TASKS_CONFIG[taskId];
-            appState.activeTask = task;
-            
-            document.getElementById('mt-title').innerText = task.title;
-            document.getElementById('mt-step1').innerText = task.step1;
-            document.getElementById('mt-reward').innerText = task.reward;
-            
-            document.getElementById('modal-container').classList.add('open');
-            tg.HapticFeedback.impactOccurred('medium');
-        }
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        function closeTaskModal() {
-            document.getElementById('modal-container').classList.remove('open');
-        }
+    const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev"; 
 
-        function redirectToTask() {
-            if (appState.activeTask.url !== "#") {
-                tg.openTelegramLink(appState.activeTask.url);
-            } else {
-                tg.showAlert("Реклама загружается...");
-            }
-        }
+    // 1. Инициализация пользователя
+    if (tg.initDataUnsafe.user) {
+        const user = tg.initDataUnsafe.user;
+        document.getElementById('user-name').innerText = user.first_name;
+        document.getElementById('user-avatar').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0A84FF&color=fff`;
+        document.getElementById('ref-link').value = `https://t.me/dwadw_bot?start=${user.id}`;
+    }
 
-        // ПРОВЕРКА ЗАДАНИЯ ЧЕРЕЗ СЕРВЕР (ИНТЕГРАЦИЯ)
-        async function verifyTaskCompletion() {
-            const btn = document.getElementById('mt-btn-check');
-            btn.innerText = "Синхронизация...";
-            btn.disabled = true;
+    // 2. Навигация между страницами
+    function switchPage(pageId, el) {
+        tg.HapticFeedback.impactOccurred('light');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-            try {
-                const response = await fetch(`${SERVER_URL}/complete_task`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: appState.userId,
-                        amount: appState.activeTask.value,
-                        task_name: appState.activeTask.title
-                    })
-                });
-
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showToast(`+${appState.activeTask.value} ₴ начислено!`);
-                    updateBalanceUI(result.new_balance);
-                    closeTaskModal();
-                } else {
-                    tg.showAlert(result.message || "Условия не выполнены!");
-                }
-            } catch (err) {
-                tg.showAlert("Ошибка связи с сервером. Проверьте соединение.");
-            } finally {
-                btn.innerText = "Проверить";
-                btn.disabled = false;
-            }
-        }
-
-        // Обновление баланса
-        function updateBalanceUI(newVal) {
-            appState.balance = newVal;
-            const elements = ['balance-main', 'balance-wallet'];
-            elements.forEach(id => {
-                document.getElementById(id).innerText = newVal.toFixed(2);
+    // 3. Работа с Балансом (Backend)
+    async function loadBalance() {
+        const userId = tg.initDataUnsafe.user?.id || 0;
+        try {
+            const response = await fetch(`${API_URL}/get_balance`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId })
             });
-            
-            // Прогресс бар вывода
-            const progress = Math.min((newVal / 100) * 100, 100);
-            document.getElementById('p-bar').style.width = progress + "%";
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = "✅ " + msg;
-            t.classList.add('visible');
-            tg.HapticFeedback.notificationOccurred('success');
-            setTimeout(() => t.classList.remove('visible'), 3000);
-        }
-
-        function shareReferral() {
-            const link = `https://t.me/share/url?url=t.me/your_bot?start=${appState.userId}&text=Зарабатывай на простых заданиях вместе со мной!`;
-            tg.openTelegramLink(link);
-        }
-
-        function requestPayout() {
-            if (appState.balance < 100) {
-                tg.showAlert(`Минималка 100 ₴. Тебе не хватает ${(100 - appState.balance).toFixed(2)} ₴`);
-            } else {
-                tg.showConfirm("Создать заявку на выплату?", (ok) => {
-                    if (ok) showToast("Заявка принята в работу!");
-                });
+            const data = await response.json();
+            if (data.status === 'success') {
+                const bal = data.balance.toFixed(2);
+                document.getElementById('balance').innerText = bal;
+                document.querySelectorAll('.current-balance-wallet').forEach(e => e.innerText = bal);
             }
-        }
+        } catch (e) { console.log("DB Load Error"); }
+    }
 
-        async function fetchUserData() {
-            // Здесь будет первичная загрузка баланса из БД при старте
-            try {
-                const res = await fetch(`${SERVER_URL}/get_balance`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ user_id: appState.userId })
-                });
-                const data = await res.json();
-                if(data.balance !== undefined) updateBalanceUI(data.balance);
-            } catch(e) {}
-        }
+    async function takeTask(reward) {
+        tg.HapticFeedback.impactOccurred('medium');
+        const userId = tg.initDataUnsafe.user?.id || 0;
+        
+        try {
+            const response = await fetch(`${API_URL}/complete_task`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, amount: reward })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                tg.showAlert(`Задание выполнено! +${reward} ₴`);
+                loadBalance();
+            }
+        } catch (e) { tg.showAlert("Ошибка сервера"); }
+    }
 
-    </script>
+    // 4. Модальные окна
+    function openModal(id) {
+        tg.HapticFeedback.impactOccurred('medium');
+        const modal = document.getElementById(id);
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function processWithdraw() {
+        tg.showConfirm("Вывести средства?", (ok) => {
+            if(ok) {
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert("Заявка принята! Ожидайте поступления.");
+                closeModal('modal-withdraw-card');
+            }
+        });
+    }
+
+    // 5. Визуальные эффекты (Выплаты и Таймер)
+    function generatePayouts() {
+        const names = ["Andrey", "Sasha", "Vova", "Elena", "Dmitry", "M. K.", "Ivan", "R. Stark"];
+        const list = document.getElementById('payout-list');
+        for(let i=0; i<8; i++) {
+            const name = names[Math.floor(Math.random()*names.length)];
+            const sum = (Math.random() * 5000 + 300).toFixed(0);
+            list.innerHTML += `
+                <div class="payout-card">
+                    <div style="font-size: 10px; color: #8e8e93;">Выплата</div>
+                    <div style="font-weight: 800; color: var(--ios-success); margin: 4px 0;">${sum} ₴</div>
+                    <div style="font-size: 11px; white-space: nowrap;">${name}****</div>
+                </div>
+            `;
+        }
+    }
+
+    function startTimer() {
+        let h = 21, m = 34, s = 49;
+        setInterval(() => {
+            s--;
+            if(s<0) { s=59; m--; }
+            if(m<0) { m=59; h--; }
+            document.getElementById('timer').innerText = 
+                `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+
+    // Старт
+    loadBalance();
+    generatePayouts();
+    startTimer();
+
+</script>
 </body>
 </html>
