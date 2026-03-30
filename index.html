@@ -8,11 +8,11 @@
     <style>
         :root {
             --ios-bg: #000000;
-            --ios-glass: rgba(28, 28, 30, 0.8);
+            --ios-glass: rgba(28, 28, 30, 0.9);
             --ios-text: #ffffff;
             --ios-accent: #0A84FF;
             --ios-success: #32D74B;
-            --ios-modal-bg: #f2f2f7;
+            --ios-dark-card: #1c1c1e; /* Темный стиль для плашек */
         }
 
         body {
@@ -20,7 +20,7 @@
             background-color: var(--ios-bg);
             background-image: radial-gradient(circle at 50% -20%, #1c2c4c 0%, #000000 100%);
             color: var(--ios-text);
-            margin: 0; padding: 20px 16px 100px 16px; /* Отступ снизу для кнопки вывода */
+            margin: 0; padding: 20px 16px 110px 16px;
             display: flex; flex-direction: column; gap: 18px;
             -webkit-user-select: none;
         }
@@ -36,16 +36,18 @@
 
         .profile-header { display: flex; justify-content: space-between; align-items: center; }
         .avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ios-accent); background: #2c2c2e; }
-        .nickname { font-weight: 700; font-size: 17px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Последние выплаты */
+        /* Последние выплаты (Темный Стиль) */
         .payouts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .payout-item {
-            background: #ffffff; color: #000; border-radius: 18px; padding: 12px; text-align: center;
+            background: var(--ios-dark-card); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #fff; border-radius: 18px; padding: 12px; text-align: center;
+            transition: all 0.5s ease;
         }
         .payout-time { font-size: 11px; color: #8e8e93; margin-bottom: 4px; }
-        .payout-amount { font-size: 18px; font-weight: 800; }
-        .payout-user { font-size: 11px; color: #8e8e93; margin-top: 4px; }
+        .payout-amount { font-size: 17px; font-weight: 800; color: var(--ios-success); }
+        .payout-user { font-size: 10px; color: #8e8e93; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Задания */
         .task-card { margin-bottom: 12px; }
@@ -58,29 +60,23 @@
             font-size: 16px; font-weight: 600; cursor: pointer;
         }
 
+        /* Кнопка вывода (Темный Стиль) */
         .fixed-bottom {
             position: fixed; bottom: 20px; left: 16px; right: 16px; z-index: 100;
+        }
+        .btn-withdraw {
+            width: 100%; background: #1c1c1e; color: #fff;
+            border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 18px;
+            font-size: 17px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
         /* Модалки */
         .sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
-            padding: 20px; box-sizing: border-box;
-        }
-        .sheet-content {
-            background: var(--ios-modal-bg); width: 100%; max-width: 340px;
-            border-radius: 30px; padding: 20px; color: #000; position: relative;
-        }
-        .ios-input {
-            width: 100%; border: none; background: #ffffff; padding: 16px;
-            border-radius: 14px; margin-bottom: 12px; font-size: 16px; box-sizing: border-box;
-        }
-        .close-btn {
-            position: absolute; top: 16px; right: 16px; width: 26px; height: 26px;
-            background: #e5e5ea; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; color: #8e8e93; cursor: pointer;
         }
     </style>
 </head>
@@ -91,7 +87,7 @@
             <img src="" id="user-avatar" class="avatar" alt="👤">
             <div>
                 <div style="font-size: 12px; opacity: 0.5;">Привет,</div>
-                <div class="nickname" id="user-name">Загрузка...</div>
+                <div class="nickname" id="user-name" style="font-weight:700">Дмитрий</div>
             </div>
         </div>
         <div style="text-align: right;">
@@ -100,17 +96,17 @@
         </div>
     </div>
 
-    <div class="section-label">Последние выплаты</div>
-    <div class="payouts-grid">
-        <div class="payout-item">
-            <div class="payout-time">23:42</div>
-            <div class="payout-amount">8 406 ₴</div>
-            <div class="payout-user">E******** H*******</div>
+    <div class="section-label">Последние выплаты (Live)</div>
+    <div class="payouts-grid" id="payouts-container">
+        <div class="payout-item" id="p-card-1">
+            <div class="payout-time">Обновление...</div>
+            <div class="payout-amount">... ₴</div>
+            <div class="payout-user">Загрузка данных</div>
         </div>
-        <div class="payout-item">
-            <div class="payout-time">23:35</div>
-            <div class="payout-amount">2 270 ₴</div>
-            <div class="payout-user">П**** И*****</div>
+        <div class="payout-item" id="p-card-2">
+            <div class="payout-time">Обновление...</div>
+            <div class="payout-amount">... ₴</div>
+            <div class="payout-user">Загрузка данных</div>
         </div>
     </div>
 
@@ -121,7 +117,7 @@
             <span>Подписка на канал</span>
             <span style="color: var(--ios-success); font-weight: 700;">+0.50 ₴</span>
         </div>
-        <button class="btn-blue" onclick="takeTask(0.50)">Выполнить задание</button>
+        <button class="btn-blue" onclick="takeTask(0.50)">Выполнить</button>
     </div>
 
     <div class="liquid-card task-card">
@@ -134,18 +130,18 @@
 
     <div class="liquid-card task-card">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-            <span>Подать заявку в закрытый чат</span>
-            <span style="color: var(--ios-success); font-weight: 700;">+0.80 ₴</span>
+            <span>Пригласить 3 друзей</span>
+            <span style="color: var(--ios-success); font-weight: 700;">+5.00 ₴</span>
         </div>
-        <button class="btn-blue" onclick="takeTask(0.80)">Подать заявку</button>
+        <button class="btn-blue" onclick="tg.openTelegramLink('https://t.me/share/url?url=t.me/your_bot')">Пригласить</button>
     </div>
 
     <div class="liquid-card task-card">
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-            <span>Подать заявку на спонсора</span>
-            <span style="color: var(--ios-success); font-weight: 700;">+1.20 ₴</span>
+            <span style="font-size: 14px;">Лайк на последний пост в канале</span>
+            <span style="color: var(--ios-success); font-weight: 700;">+1.00 ₴</span>
         </div>
-        <button class="btn-blue" onclick="takeTask(1.20)">Подать заявку</button>
+        <button class="btn-blue" onclick="takeTask(1.00)">Проверить лайк</button>
     </div>
 
     <div class="liquid-card task-card">
@@ -157,77 +153,65 @@
     </div>
 
     <div class="fixed-bottom">
-        <button class="btn-blue" style="background: #ffffff; color: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" onclick="openMainSheet()">
-            💳 Вывод денег
+        <button class="btn-withdraw" onclick="openMainSheet()">
+            <span>💳</span> Вывод денег
         </button>
-    </div>
-
-    <div class="sheet-overlay" id="main-sheet">
-        <div class="sheet-content">
-            <div class="close-btn" onclick="closeAll()">✕</div>
-            <h2 style="margin-top:0">Выбор метода</h2>
-            <button class="ios-input" style="text-align:left; font-weight:600" onclick="openCardSheet()">💳 На карту банка</button>
-            <button class="ios-input" style="text-align:left; font-weight:600" onclick="openCryptoSheet()">🌐 Криптовалюта</button>
-        </div>
-    </div>
-
-    <div class="sheet-overlay" id="card-sheet">
-        <div class="sheet-content">
-            <div class="close-btn" onclick="openMainSheet()">←</div>
-            <h2 style="margin-top:0">На карту</h2>
-            <input type="text" class="ios-input" placeholder="Номер карты">
-            <input type="number" class="ios-input" placeholder="Сумма (₴)">
-            <button class="btn-blue" onclick="processWithdraw()">Вывести</button>
-        </div>
-    </div>
-
-    <div class="sheet-overlay" id="crypto-sheet">
-        <div class="sheet-content">
-            <div class="close-btn" onclick="openMainSheet()">←</div>
-            <h2 style="margin-top:0">Криптовалюта</h2>
-            <input type="text" class="ios-input" placeholder="USDT TRC20 Адрес">
-            <input type="number" class="ios-input" placeholder="Сумма (₴)">
-            <button class="btn-blue" onclick="processWithdraw()">Вывести</button>
-        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev"; 
 
+        // 1. Динамическое обновление выплат (от 1 до 15 сек)
+        const names = ["Dmitry", "Alex", "Sasha", "Ivan", "Elena", "Mikhail", "Oleg", "Anna", "Vova", "Pavel"];
+        const surnames = ["N.", "K.", "S.", "V.", "M.", "B.", "T.", "L."];
+
+        function updateRandomPayout(cardId) {
+            const card = document.getElementById(cardId);
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const amount = (Math.random() * (15000 - 500) + 500).toFixed(0);
+            const user = names[Math.floor(Math.random() * names.length)] + "**** " + surnames[Math.floor(Math.random() * surnames.length)] + "*******";
+
+            card.style.opacity = 0;
+            setTimeout(() => {
+                card.querySelector('.payout-time').innerText = time;
+                card.querySelector('.payout-amount').innerText = amount + " ₴";
+                card.querySelector('.payout-user').innerText = user;
+                card.style.opacity = 1;
+            }, 500);
+
+            // Рандомный интервал от 1000 до 15000 мс
+            const nextUpdate = Math.floor(Math.random() * (15000 - 1000) + 1000);
+            setTimeout(() => updateRandomPayout(cardId), nextUpdate);
+        }
+
+        // Запуск обновления
+        updateRandomPayout('p-card-1');
+        setTimeout(() => updateRandomPayout('p-card-2'), 3000);
+
+        // Инициализация юзера
         if (tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
             document.getElementById('user-name').innerText = user.first_name;
             document.getElementById('user-avatar').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0A84FF&color=fff`;
         }
 
-        function closeAll() { document.querySelectorAll('.sheet-overlay').forEach(s => s.style.display = 'none'); }
-        function openMainSheet() { closeAll(); document.getElementById('main-sheet').style.display = 'flex'; }
-        function openCardSheet() { closeAll(); document.getElementById('card-sheet').style.display = 'flex'; }
-        function openCryptoSheet() { closeAll(); document.getElementById('crypto-sheet').style.display = 'flex'; }
-
-        function processWithdraw() {
-            tg.showConfirm("Подтвердить вывод средств?", (ok) => {
-                if(ok) { tg.showAlert("Заявка принята!"); closeAll(); }
+        // Логика заданий (пример)
+        async function takeTask(reward) {
+            tg.HapticFeedback.impactOccurred('medium');
+            tg.showConfirm("Вы действительно выполнили задание?", (ok) => {
+                if(ok) {
+                    let bal = parseFloat(document.getElementById('balance').innerText);
+                    document.getElementById('balance').innerText = (bal + reward).toFixed(2);
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
             });
         }
 
-        async function takeTask(reward) {
-            tg.HapticFeedback.impactOccurred('medium');
-            const userId = tg.initDataUnsafe.user?.id || 0;
-            try {
-                const response = await fetch(`${API_URL}/complete_task`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: userId, amount: reward})
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    document.getElementById('balance').innerText = data.new_balance.toFixed(2);
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            } catch (e) { tg.showAlert("Ошибка сервера"); }
+        function openMainSheet() {
+            tg.HapticFeedback.selectionChanged();
+            tg.showAlert("Меню вывода средств в разработке.");
         }
     </script>
 </body>
