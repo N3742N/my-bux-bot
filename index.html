@@ -1,45 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Биржа Труда</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .balance { font-size: 24px; color: #28a745; font-weight: bold; margin-bottom: 20px; }
-        button { background: #0088cc; color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; width: 100%; }
+        :root {
+            --tg-theme-bg-color: #f0f2f5;
+            --tg-theme-button-color: #248bcf;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-text-color: #222;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Шапка профиля */
+        .header {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 10px; }
+        .balance-card { background: #f8f9fa; padding: 8px 15px; border-radius: 12px; text-align: center; }
+        .balance-val { font-weight: bold; color: #2ecc71; font-size: 1.1em; }
+
+        /* Баннер */
+        .banner {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner h2 { margin: 0; font-size: 1.4em; }
+        .banner-timer { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; display: inline-block; margin-top: 10px; font-size: 0.9em; }
+
+        /* Выплаты (Статистика) */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-item { background: white; padding: 12px; border-radius: 12px; text-align: center; }
+        .stat-price { font-weight: bold; font-size: 1.1em; display: block; margin: 4px 0; }
+        .stat-label { font-size: 0.75em; color: #888; }
+
+        /* Задание */
+        .task-card { background: white; padding: 15px; border-radius: 15px; border-left: 5px solid #2ecc71; }
+        .btn-action {
+            width: 100%;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        .online-dot { color: #2ecc71; font-size: 0.8em; text-align: center; margin-bottom: 5px;}
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Твой Баланс</h2>
-        <div id="balance" class="balance">0.00 ₴</div>
-        <hr>
-        <p>Подпишись на канал и нажми кнопку:</p>
-        <button onclick="claim()">Проверить и получить 0.50 ₴</button>
+
+    <div class="online-dot">● Пользователей в онлайне: 9 326</div>
+
+    <div class="header">
+        <div class="user-info">
+            <div class="avatar" id="user-avatar"></div>
+            <div>
+                <div style="font-size: 0.8em; color: #888;">Биржа труда</div>
+                <div id="user-name" style="font-weight: bold;">Привет!</div>
+            </div>
+        </div>
+        <div class="balance-card">
+            <span id="balance" class="balance-val">0.00</span>
+            <div style="font-size: 0.7em;">₴</div>
+        </div>
+    </div>
+
+    <div class="banner">
+        <h2>Выполняй задания!</h2>
+        <div>Бонус +15% на выполнение</div>
+        <div class="banner-timer" id="timer">00д : 03ч : 45м : 12с</div>
+    </div>
+
+    <div style="font-weight: bold; padding: 0 5px;">ПОСЛЕДНИЕ ВЫПЛАТЫ</div>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-label">22:55</span>
+            <span class="stat-price">14 168 ₴</span>
+            <span class="stat-label">П**** В*****</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">22:52</span>
+            <span class="stat-price">10 401 ₴</span>
+            <span class="stat-label">П**** П******</span>
+        </div>
+    </div>
+
+    <div style="font-weight: bold; padding: 0 5px; margin-top: 5px;">ДОСТУПНЫЕ ЗАДАНИЯ</div>
+    <div class="task-card">
+        <div style="display: flex; justify-content: space-between;">
+            <span style="font-weight: bold;">Подписаться на канал</span>
+            <span style="color: #2ecc71; font-weight: bold;">+ 0.50 ₴</span>
+        </div>
+        <button class="btn-action" onclick="completeTask()">Проверить и получить</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        const user_id = tg.initDataUnsafe.user.id;
-        const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev";// Сюда адрес бэкенда
+        tg.expand(); // Развернуть на весь экран
 
-        async function updateBalance() {
-            const r = await fetch(`${API_URL}/get_balance?user_id=${user_id}`);
-            const data = await r.json();
-            document.getElementById('balance').innerText = data.balance.toFixed(2) + " ₴";
+        // Ссылка на твой Ngrok (замени на свою актуальную!)
+        const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev";
+
+        // Подгружаем имя юзера из телеграма
+        if (tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = `Привет, ${tg.initDataUnsafe.user.first_name}!`;
         }
 
-        async function claim() {
-            await fetch(`${API_URL}/complete_task`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user_id: user_id})
-            });
-            updateBalance();
-            tg.showAlert("Деньги начислены!");
+        async function completeTask() {
+            const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 12345;
+            
+            try {
+                const response = await fetch(`${API_URL}/complete_task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const data = await response.json();
+                if (data.status === 'success') {
+                    document.getElementById('balance').innerText = data.new_balance.toFixed(2);
+                    tg.showAlert("✅ Деньги начислены на баланс!");
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                tg.showAlert("❌ Ошибка связи с сервером (Проверь Ngrok)");
+            }
         }
-
-        updateBalance();
     </script>
 </body>
 </html>
