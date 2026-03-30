@@ -24,7 +24,6 @@
             gap: 12px;
         }
 
-        /* Шапка профиля */
         .header {
             background: white;
             padding: 15px;
@@ -36,124 +35,167 @@
         }
 
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 10px; }
+        .avatar { width: 40px; height: 40px; background: #5d9cec; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .balance-card { background: #f8f9fa; padding: 8px 15px; border-radius: 12px; text-align: center; }
         .balance-val { font-weight: bold; color: #2ecc71; font-size: 1.1em; }
 
-        /* Баннер */
         .banner {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             padding: 20px;
             border-radius: 15px;
-            position: relative;
-            overflow: hidden;
+            text-align: center;
         }
-        .banner h2 { margin: 0; font-size: 1.4em; }
-        .banner-timer { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; display: inline-block; margin-top: 10px; font-size: 0.9em; }
 
-        /* Выплаты (Статистика) */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-item { background: white; padding: 12px; border-radius: 12px; text-align: center; }
-        .stat-price { font-weight: bold; font-size: 1.1em; display: block; margin: 4px 0; }
+        .stat-item { background: white; padding: 12px; border-radius: 12px; text-align: center; transition: all 0.3s; }
+        .stat-price { font-weight: bold; font-size: 1.1em; display: block; color: #2ecc71; }
         .stat-label { font-size: 0.75em; color: #888; }
 
-        /* Задание */
-        .task-card { background: white; padding: 15px; border-radius: 15px; border-left: 5px solid #2ecc71; }
+        /* Блок заданий */
+        .section-title { font-weight: bold; padding: 5px; font-size: 0.9em; text-transform: uppercase; color: #555; }
+        .task-list { display: flex; flex-direction: column; gap: 10px; }
+        .task-card { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .task-info { display: flex; justify-content: space-between; align-items: center; }
+        .task-name { font-weight: bold; font-size: 0.95em; }
+        .task-reward { color: #2ecc71; font-weight: bold; }
+        
         .btn-action {
             width: 100%;
             background: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 10px;
             font-weight: bold;
-            margin-top: 10px;
             cursor: pointer;
         }
-        
-        .online-dot { color: #2ecc71; font-size: 0.8em; text-align: center; margin-bottom: 5px;}
+
+        .online-dot { color: #2ecc71; font-size: 0.8em; text-align: center; margin-bottom: 5px; font-weight: bold;}
     </style>
 </head>
 <body>
 
-    <div class="online-dot">● Пользователей в онлайне: 9 326</div>
+    <div class="online-dot" id="online-counter">● Пользователей в онлайне: 9 326</div>
 
     <div class="header">
         <div class="user-info">
-            <div class="avatar" id="user-avatar"></div>
+            <div class="avatar" id="user-letter">U</div>
             <div>
-                <div style="font-size: 0.8em; color: #888;">Биржа труда</div>
-                <div id="user-name" style="font-weight: bold;">Привет!</div>
+                <div style="font-size: 0.75em; color: #888;">Профиль</div>
+                <div id="user-name" style="font-weight: bold;">Загрузка...</div>
             </div>
         </div>
         <div class="balance-card">
-            <span id="balance" class="balance-val">0.00</span>
-            <div style="font-size: 0.7em;">₴</div>
+            <span id="balance" class="balance-val">0.00</span> ₴
         </div>
     </div>
 
     <div class="banner">
-        <h2>Выполняй задания!</h2>
-        <div>Бонус +15% на выполнение</div>
-        <div class="banner-timer" id="timer">00д : 03ч : 45м : 12с</div>
+        <h2 style="margin:0">Выполняй задания!</h2>
+        <div style="font-size: 0.9em; opacity: 0.9;">Бонус +15% к выплатам сегодня</div>
     </div>
 
-    <div style="font-weight: bold; padding: 0 5px;">ПОСЛЕДНИЕ ВЫПЛАТЫ</div>
-    <div class="stats-grid">
-        <div class="stat-item">
-            <span class="stat-label">22:55</span>
-            <span class="stat-price">14 168 ₴</span>
-            <span class="stat-label">П**** В*****</span>
+    <div class="section-title">Последние выплаты</div>
+    <div class="stats-grid" id="payouts-container">
         </div>
-        <div class="stat-item">
-            <span class="stat-label">22:52</span>
-            <span class="stat-price">10 401 ₴</span>
-            <span class="stat-label">П**** П******</span>
-        </div>
-    </div>
 
-    <div style="font-weight: bold; padding: 0 5px; margin-top: 5px;">ДОСТУПНЫЕ ЗАДАНИЯ</div>
-    <div class="task-card">
-        <div style="display: flex; justify-content: space-between;">
-            <span style="font-weight: bold;">Подписаться на канал</span>
-            <span style="color: #2ecc71; font-weight: bold;">+ 0.50 ₴</span>
+    <div class="section-title">Доступные задания</div>
+    <div class="task-list">
+        <div class="task-card">
+            <div class="task-info">
+                <span class="task-name">📢 Подписаться на канал</span>
+                <span class="task-reward">+ 0.50 ₴</span>
+            </div>
+            <button class="btn-action" onclick="completeTask()">Проверить и получить</button>
         </div>
-        <button class="btn-action" onclick="completeTask()">Проверить и получить</button>
+        <div class="task-card">
+            <div class="task-info">
+                <span class="task-name">📝 Подать заявку в группу</span>
+                <span class="task-reward">+ 0.75 ₴</span>
+            </div>
+            <button class="btn-action" onclick="completeTask()">Выполнить</button>
+        </div>
+        <div class="task-card">
+            <div class="task-info">
+                <span class="task-name">👥 Пригласить друга</span>
+                <span class="task-reward">+ 1.50 ₴</span>
+            </div>
+            <button class="btn-action" onclick="completeTask()">Пригласить</button>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+        tg.expand();
 
-        // Ссылка на твой Ngrok (замени на свою актуальную!)
         const API_URL = "https://unpeaked-jumpily-hien.ngrok-free.dev";
 
-        // Подгружаем имя юзера из телеграма
+        // 1. Динамический онлайн (меняется при каждом заходе)
+        function updateOnline() {
+            const baseOnline = 9000;
+            const randomExtra = Math.floor(Math.random() * 500);
+            document.getElementById('online-counter').innerText = `● Пользователей в онлайне: ${baseOnline + randomExtra}`;
+        }
+
+        // 2. Рандомные выплаты (меняются каждые 5 секунд)
+        const names = ["А**** К*****", "М**** С*****", "Д**** Н*****", "И**** П*****", "С**** Б*****", "Е**** М*****"];
+        function generatePayouts() {
+            const container = document.getElementById('payouts-container');
+            container.innerHTML = '';
+            for(let i=0; i<2; i++) {
+                const time = new Date().getHours() + ":" + (new Date().getMinutes() - i);
+                const amount = (Math.random() * (15000 - 5000) + 5000).toLocaleString('ru-RU', {maximumFractionDigits: 0});
+                const name = names[Math.floor(Math.random() * names.length)];
+                
+                container.innerHTML += `
+                    <div class="stat-item">
+                        <span class="stat-label">${time}</span>
+                        <span class="stat-price">${amount} ₴</span>
+                        <span class="stat-label">${name}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Инициализация данных пользователя
         if (tg.initDataUnsafe.user) {
-            document.getElementById('user-name').innerText = `Привет, ${tg.initDataUnsafe.user.first_name}!`;
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('user-name').innerText = user.first_name;
+            document.getElementById('user-letter').innerText = user.first_name.charAt(0);
         }
 
         async function completeTask() {
             const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 12345;
-            
             try {
                 const response = await fetch(`${API_URL}/complete_task`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_id: userId })
                 });
-                
                 const data = await response.json();
                 if (data.status === 'success') {
                     document.getElementById('balance').innerText = data.new_balance.toFixed(2);
-                    tg.showAlert("✅ Деньги начислены на баланс!");
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert("✅ Задание выполнено! +0.50 ₴");
                 }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                tg.showAlert("❌ Ошибка связи с сервером (Проверь Ngrok)");
+            } catch (e) {
+                tg.showAlert("❌ Сервер недоступен (Проверь Ngrok)");
             }
         }
+
+        // Запуск циклов
+        updateOnline();
+        generatePayouts();
+        setInterval(generatePayouts, 8000); // Обновлять выплаты каждые 8 сек
     </script>
 </body>
 </html>
