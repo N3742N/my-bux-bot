@@ -784,7 +784,7 @@
         <input type="number" class="modal-input-field" placeholder="Мин. 100">
 
         <p style="font-size: 12px; color: var(--ios-text-hint); margin-bottom: 20px;">
-            * Зачисление происходит в течение 24 часов. Комиссия сети составляет 2%.
+            * Зачисление происходит в течение 24 часов. Комиссия составляет 2%.
         </p>
         <button class="modal-primary-btn" onclick="processWithdrawalRequest()">Создать заявку</button>
     </div>
@@ -810,7 +810,11 @@
                 <div style="width: 0%; height: 100%; background: var(--ios-gold); border-radius: 3px;"></div>
             </div>
         </div>
-        <button class="modal-primary-btn" style="background: var(--ios-gold); color: #000;" onclick="tg.openTelegramLink('https://t.me/share/url?url=t.me/yourbot')">Пригласить друзей</button>
+        <button class="ios-btn-main" style="margin-top: 15px;">Пригласить друзей</button>
+
+<button class="ios-btn-main" onclick="shareReferralLink()" style="margin-top: 15px;">
+    Пригласить друзей
+</button>
     </div>
 </div>
 
@@ -1051,7 +1055,25 @@
     ----------------------------------------------------------------------
     */
     window.onload = initializeApp;
+function shareReferralLink() {
+    // 1. Получаем ID пользователя из Telegram
+    const userId = window.Telegram.WebApp.initDataUnsafe.user?.id;
+    
+    if (!userId) {
+        window.Telegram.WebApp.showAlert("Ошибка: Запустите приложение через Telegram");
+        return;
+    }
 
+    // 2. ЗАМЕНИ 'ТВОЙ_БОТ' на юзернейм твоего бота без знака @
+    const botUsername = 'wdasdff_bot'; 
+    const refLink = `https://t.me/${botUsername}?start=${userId}`;
+
+    // 3. Открываем стандартное окно Telegram для пересылки сообщения
+    const shareText = `Присоединяйся к Liquid Bux и зарабатывай вместе со мной! 💰\n\n${refLink}`;
+    const fullShareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(shareText)}`;
+    
+    window.Telegram.WebApp.openTelegramLink(fullShareUrl);
+}
 </script>
 
 </body>
