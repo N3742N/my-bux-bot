@@ -860,30 +860,43 @@
     ----------------------------------------------------------------------
     */
     async function fetchUserBalance() {
-        const userId = tg.initDataUnsafe.user?.id || 0;
+    const userId = tg.initDataUnsafe.user?.id || 0;
+    try {
+        const response = await fetch(`${API_ENDPOINT}/get_balance`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        const data = await response.json();
         
-        try {
-            const response = await fetch(`${API_ENDPOINT}/get_balance`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId })
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // ПРАВКА: Лимит баланса 10.000
-                let finalBalance = data.balance > MAX_BALANCE_LIMIT ? MAX_BALANCE_LIMIT : data.balance;
-                
-                const formattedBalance = finalBalance.toFixed(2);
-                document.getElementById('balance-val-view').innerText = formattedBalance;
-                document.querySelectorAll('.wallet-sync-bal').forEach(el => el.innerText = formattedBalance);
-            }
-        } catch (error) {
-            console.error("Critical API Error (Balance):", error);
-        }
-    }
+        if (data.status === 'success') {
+            // 1. Обновляем баланс и счетчик заданий
+            document.getElementById('user-balance-view').innerText = data.balance.toFixed(2);
+            document.getElementById('tasks-completed-view').innerText = data.tasks_done;
 
+            // 2. ОБНОВЛЯЕМ ПРОГРЕСС-БАР РЕФЕРАЛОВ
+            const count = data.referrals_count || 0; // Сколько приглашено
+            const goal = 10; // Твоя цель (например, 10 рефералов)
+            
+            // Рассчитываем процент
+            const progressPercent = Math.min((count / goal) * 100, 100);
+            
+            // Находим полоску и меняем её ширину
+            const progressFill = document.querySelector('.referral-progress-fill');
+            if (progressFill) {
+                progressFill.style.width = progressPercent + '%';
+            }
+
+            // Обновляем текст (например, "3 / 10")
+            const progressText = document.getElementById('ref-count-text');
+            if (progressText) {
+                progressText.innerText = `${count} / ${goal}`;
+            }
+        }
+    } catch (e) {
+        console.error("Ошибка при получении данных:", e);
+    }
+}
     /*
     ----------------------------------------------------------------------
     [4] SUBSCRIPTION TASK LOGIC
