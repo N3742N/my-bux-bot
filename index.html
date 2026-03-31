@@ -810,11 +810,39 @@
                 <div style="width: 0%; height: 100%; background: var(--ios-gold); border-radius: 3px;"></div>
             </div>
         </div>
-        <button class="ios-btn-main" style="margin-top: 15px;">Пригласить друзей</button>
-
-<button class="ios-btn-main" onclick="shareReferralLink()" style="margin-top: 15px;">
-    Пригласить друзей
+        <button class="ios-invite-button" onclick="shareReferralLink()">
+    <span class="invite-icon">🔗</span> Пригласить друзей
 </button>
+
+<style>
+.ios-invite-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    background: linear-gradient(180deg, #0A84FF 0%, #0070E0 100%);
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(10, 132, 255, 0.25);
+    transition: transform 0.1s ease, opacity 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ios-invite-button:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+}
+
+.invite-icon {
+    font-size: 20px;
+}
+</style>
     </div>
 </div>
 
@@ -839,6 +867,27 @@
     ----------------------------------------------------------------------
     */
     function initializeApp() {
+        // Добавь это в самое начало функции initializeApp
+const urlParams = new URLSearchParams(window.location.search);
+const startParam = urlParams.get('ref');
+
+if (startParam && startParam !== 'None' && startParam !== 'null') {
+    const userId = window.Telegram.WebApp.initDataUnsafe.user?.id;
+    
+    // Отправляем запрос на регистрацию реферала
+    fetch(`${API_ENDPOINT}/register_user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: userId,
+            ref_id: startParam
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log('Реферал успешно обработан:', data))
+    .catch(error => console.error('Ошибка регистрации реферала:', error));
+}
+
         // Fetching User Data from Telegram
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
