@@ -627,15 +627,15 @@
 
         <div class="section-label-header">Твоя активность</div>
         <div class="activity-main-grid">
-            <div class="activity-card-stat">
-                <span class="stat-label-title">Заданий</span>
-                <div class="stat-value-display" id="tasks-count-view">24</div>
-            </div>
-            <div class="activity-card-stat">
-                <span class="stat-label-title">Доход</span>
-                <div class="stat-value-display" id="income-sum-view" style="color: var(--ios-success);">+142.0</div>
-            </div>
-        </div>
+    <div class="activity-card-stat">
+        <span class="stat-label-title">Заданий</span>
+        <div class="stat-value-display" id="tasks-count-view">0</div>
+    </div>
+    <div class="activity-card-stat">
+        <span class="stat-label-title">Доход</span>
+        <div class="stat-value-display" id="income-sum-view" style="color: var(--ios-success);">+0.00</div>
+    </div>
+</div>
     </div>
 
     <div id="page-tasks" class="page">
@@ -905,43 +905,49 @@
     }
 
     async function executeVerificationRequest() {
-        const userId = tg.initDataUnsafe.user?.id || 0;
-        const btn = document.getElementById('btn-verify-sub-action');
-        
-        btn.innerText = "Проверка...";
-        btn.disabled = true;
-        btn.style.opacity = "0.7";
+    const userId = tg.initDataUnsafe.user?.id || 0;
+    const btn = document.getElementById('btn-verify-sub-action');
+    
+    btn.innerText = "Проверка...";
+    btn.disabled = true;
+    btn.style.opacity = "0.7";
 
-        try {
-            const response = await fetch(`${API_ENDPOINT}/verify_sub`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: userId,
-                    channel_id: activeSubTask.channelId,
-                    reward: activeSubTask.reward
-                })
-            });
+    try {
+        const response = await fetch(`${API_ENDPOINT}/verify_sub`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                channel_id: activeSubTask.channelId,
+                reward: activeSubTask.reward
+            })
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.status === 'success') {
-                tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert("✅ Задание выполнено! Средства начислены.");
-                fetchUserBalance();
-                closeModalById('modal-subscription-check');
+        if (data.status === 'success') {
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("✅ Заявка обнаружена! Оплата зачислена."); // Твой текст
+            fetchUserBalance();
+            closeModalById('modal-subscription-check');
+        } else {
+            tg.HapticFeedback.notificationOccurred('error');
+            
+            // Если сервер ответил, что заявки нет, выводим твою надпись
+            if (data.message === "no_request") {
+                tg.showAlert("❌ Вы не подали заявку на вступление!");
             } else {
-                tg.HapticFeedback.notificationOccurred('error');
-                tg.showAlert("❌ Бот не увидел подписку. Попробуйте еще раз.");
+                tg.showAlert("❌ Ошибка: " + (data.message || "попробуйте позже"));
             }
-        } catch (e) {
-            tg.showAlert("Сервер временно недоступен.");
-        } finally {
-            btn.innerText = "Подтвердить участие";
-            btn.disabled = false;
-            btn.style.opacity = "1";
         }
+    } catch (e) {
+        tg.showAlert("Сервер временно недоступен.");
+    } finally {
+        btn.innerText = "Подтвердить участие";
+        btn.disabled = false;
+        btn.style.opacity = "1";
     }
+}
 
     document.getElementById('btn-verify-sub-action').onclick = executeVerificationRequest;
 
