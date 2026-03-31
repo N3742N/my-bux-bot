@@ -661,7 +661,7 @@
                         <span class="task-reward-badge">+0.75 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/+oJYwxIoOJ3wzNzBk', '-1003781233682')">Открыть</button>
+                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/1212121212zBk', '-1003123123233682')">Открыть</button>
             </div>
 
             <div class="task-entry">
@@ -694,7 +694,7 @@
                         <span class="task-reward-badge">+2.50 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/+oJYwxIoOJ3wzNzBk', '-1003781233682')">Открыть</button>
+                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/1121212121', '-100378112382')">Открыть</button>
             </div>
 
             <div class="task-entry task-premium-gold">
@@ -838,7 +838,22 @@ function initializeApp() {
     }
 
     fetchBalance();
+
+    // 🔥 РЕФЕРАЛКА (внутри функции)
+    const startParam = tg.initDataUnsafe.start_param;
+
+    if (startParam) {
+        fetch(API_ENDPOINT + "/ref", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                user_id: tg.initDataUnsafe.user.id,
+                ref_id: startParam
+            })
+        });
+    }
 }
+
 
 // ---------------- BALANCE ----------------
 async function fetchBalance() {
@@ -894,14 +909,12 @@ async function executeVerificationRequest() {
     const data = await res.json();
 
     if (data.status === "success") {
-        tg.HapticFeedback.notificationOccurred('success');
-        tg.showAlert("✅ Начислено!");
-        fetchBalance();
-        closeModalById('modal-subscription-check');
-    } else {
-        tg.HapticFeedback.notificationOccurred('error');
-        tg.showAlert("❌ Подпишись сначала");
-    }
+    tg.showAlert("✅ Начислено!");
+    fetchBalance();
+    closeModalById('modal-subscription-check');
+} else {
+    tg.showAlert(data.message || "❌ Ошибка");
+}
 
     btn.innerText = "Подтвердить участие";
     btn.disabled = false;
@@ -926,7 +939,7 @@ function closeModalById(id) {
     document.getElementById(id).classList.remove('active');
 }
 
-window.onload = initializeApp;
+document.addEventListener("DOMContentLoaded", initializeApp);
 
 </script>
 
