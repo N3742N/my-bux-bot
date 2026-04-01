@@ -870,8 +870,7 @@
     tg.expand();
     
     // 1. ПРОВЕРКА РЕФЕРАЛА ПРИ ВХОДЕ
-    const urlParams = new URLSearchParams(window.location.search);
-    const startParam = urlParams.get('ref'); // Получаем ID пригласителя из URL
+   const startParam = tg.initDataUnsafe.start_param; // Получаем ID пригласителя из URL
 
     if (startParam && startParam !== 'None' && startParam !== 'null') {
         const userId = tg.initDataUnsafe.user?.id;
