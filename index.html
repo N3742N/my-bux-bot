@@ -872,11 +872,13 @@
    // сначала пробуем Telegram
 let startParam = tg.initDataUnsafe.start_param;
 
-// если нет — берём из URL (fallback)
+// fallback на URL
 if (!startParam) {
     const urlParams = new URLSearchParams(window.location.search);
-    startParam = urlParams.get("startapp");
+    startParam = urlParams.get("ref"); // 🔥 ВОТ ЭТО ВАЖНО
 }
+
+console.log("REF:", startParam);
 
 console.log("START PARAM:", startParam); // Получаем ID пригласителя из URL
 
