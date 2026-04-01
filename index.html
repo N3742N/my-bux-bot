@@ -804,10 +804,9 @@
         <div style="background: rgba(255, 204, 0, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 25px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span>Прогресс:</span>
-                <span style="font-weight: 800; color: var(--ios-gold);">0 / 10</span>
-            </div>
+            <span id="ref-count-text" style="font-weight: 800; color: var(--ios-gold);">0 / 10</span>            </div>
             <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;">
-                <div style="width: 0%; height: 100%; background: var(--ios-gold); border-radius: 3px;"></div>
+                <div id="ref-progress-bar" style="width: 0%; height: 100%; background: var(--ios-gold); border-radius: 3px;"></div>
             </div>
         </div>
         <button class="ios-invite-button" onclick="shareReferralLink()">
@@ -949,7 +948,7 @@
             const progressPercent = Math.min((count / goal) * 100, 100);
             
             // Находим полоску и меняем её ширину
-            const progressFill = document.querySelector('.referral-progress-fill');
+            const progressFill = document.getElementById('ref-progress-bar');
             if (progressFill) {
                 progressFill.style.width = progressPercent + '%';
             }
