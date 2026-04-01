@@ -869,9 +869,18 @@
     tg.expand();
     
     // 1. ПРОВЕРКА РЕФЕРАЛА ПРИ ВХОДЕ
-   const startParam = tg.initDataUnsafe.start_param; // Получаем ID пригласителя из URL
+   // сначала пробуем Telegram
+let startParam = tg.initDataUnsafe.start_param;
 
-    if (startParam && startParam !== 'None' && startParam !== 'null') {
+// если нет — берём из URL (fallback)
+if (!startParam) {
+    const urlParams = new URLSearchParams(window.location.search);
+    startParam = urlParams.get("startapp");
+}
+
+console.log("START PARAM:", startParam); // Получаем ID пригласителя из URL
+
+    if (startParam) {
         const userId = tg.initDataUnsafe.user?.id;
         
         // Отправляем данные на сервер
