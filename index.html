@@ -879,7 +879,9 @@
         // Отправляем данные на сервер
         fetch(`${API_ENDPOINT}/register_user`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+         },
             body: JSON.stringify({
                 user_id: userId,
                 ref_id: startParam
@@ -927,7 +929,10 @@
     try {
         const response = await fetch(`${API_ENDPOINT}/get_balance`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true'
+},
             body: JSON.stringify({ user_id: userId })
         });
         const data = await response.json();
@@ -990,14 +995,17 @@
 
     try {
         const response = await fetch(`${API_ENDPOINT}/verify_sub`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: userId,
-                channel_id: activeSubTask.channelId,
-                reward: activeSubTask.reward
-            })
-        });
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+    },
+    body: JSON.stringify({
+    user_id: userId,
+    channel_id: activeSubTask.channelId,
+    reward: activeSubTask.reward
+})
+});
 
         const data = await response.json();
 
