@@ -840,7 +840,7 @@
                         <span class="task-reward-badge">+125 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="tg.showAlert('Смотрим рекламный ролик...')">Смотреть</button>
+                <button class="task-btn-action" onclick="startCatchGame(125)">пройти</button>
             </div>
 
             <div class="task-entry">
@@ -1387,7 +1387,48 @@ function showPayoutSuccess(amount) {
 function closePayoutModal() {
     document.getElementById('payoutSuccessModal').style.display = 'none';
 }
+let catchClicks = 0;
+let catchReward = 0;
 
+function startCatchGame(reward) {
+    catchReward = reward;
+    catchClicks = 0;
+
+    const modal = document.getElementById('catchGameModal');
+    const btn = document.getElementById('catchBtn');
+
+    modal.style.display = 'flex';
+
+    moveButton();
+
+    btn.onclick = () => {
+        catchClicks++;
+
+        tg.HapticFeedback.impactOccurred('medium');
+
+        if (catchClicks >= 3) {
+            closeCatchGame();
+            showPayoutSuccess(catchReward);
+            fetchUserBalance();
+        } else {
+            moveButton();
+        }
+    };
+}
+
+function moveButton() {
+    const btn = document.getElementById('catchBtn');
+
+    const x = Math.random() * 220;
+    const y = Math.random() * 180;
+
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+}
+
+function closeCatchGame() {
+    document.getElementById('catchGameModal').style.display = 'none';
+}
 </script>
 <div id="payoutSuccessModal" class="modal-overlay" style="display: none;">
     <div class="modal-content-dark">
@@ -1413,6 +1454,30 @@ function closePayoutModal() {
         </div>
     </div>
 </div>
+<div id="catchGameModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content-dark" style="height:300px; position:relative; overflow:hidden;">
+        
+        <h3 style="color:white;">Поймай награду 💰</h3>
+        <p style="color:#8e8e93; font-size:14px;">Нажми 3 раза</p>
 
+        <div id="catchBtn"
+            style="
+            position:absolute;
+            width:60px;
+            height:60px;
+            background:#32D74B;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            cursor:pointer;
+            transition:0.2s;
+        ">
+            💰
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
