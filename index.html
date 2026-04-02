@@ -1207,7 +1207,20 @@ console.log("START PARAM:", startParam); // Получаем ID пригласи
 
     // 🔥 обновляем баланс
     fetchUserBalance();
+    
+    // 🔥 БЛОКИРОВКА КНОПОК
+    if (activeSubTask.channelId === '-1003781233683') {
+        disableTaskButton('task1Btn');
+    }
 
+    if (activeSubTask.channelId === '-1003781233682') {
+        disableTaskButton('task2Btn');
+    }
+
+    if (activeSubTask.channelId === '-1003781233681') {
+        disableTaskButton('taskVipBtn');
+    }
+    
         } else {
             tg.HapticFeedback.notificationOccurred('error');
             
@@ -1436,13 +1449,14 @@ fetch(`${API_ENDPOINT}/complete_captcha`, {
 .then(res => res.json())
 .then(data => {
 
-    if (data.status === 'success') {
-        closeCaptcha();
+   if (data.status === 'success') {
+    closeCaptcha();
 
-        showPayoutSuccess(captchaReward);
-        fetchUserBalance();
+    showPayoutSuccess(captchaReward);
+    fetchUserBalance();
 
-    } else {
+    disableTaskButton('captchaBtn'); // 🔥 ДОБАВЬ СЮДА
+} else {
         tg.showAlert("❌ Ты уже выполнил это задание");
     }
 
