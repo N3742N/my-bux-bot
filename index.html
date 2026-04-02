@@ -1395,25 +1395,40 @@ function startCatchGame(reward) {
     catchClicks = 0;
 
     const modal = document.getElementById('catchGameModal');
-    const btn = document.getElementById('catchBtn');
+
+    // 🔥 защита от краша
+    if (!modal) {
+        alert("Ошибка: модалка не найдена");
+        return;
+    }
 
     modal.style.display = 'flex';
 
-    moveButton();
+    // ждем пока DOM обновится
+    setTimeout(() => {
+        const btn = document.getElementById('catchBtn');
 
-    btn.onclick = () => {
-        catchClicks++;
-
-        tg.HapticFeedback.impactOccurred('medium');
-
-        if (catchClicks >= 3) {
-            closeCatchGame();
-            showPayoutSuccess(catchReward);
-            fetchUserBalance();
-        } else {
-            moveButton();
+        if (!btn) {
+            alert("Ошибка: кнопка не найдена");
+            return;
         }
-    };
+
+        moveButton();
+
+        btn.onclick = () => {
+            catchClicks++;
+
+            tg.HapticFeedback.impactOccurred('medium');
+
+            if (catchClicks >= 3) {
+                closeCatchGame();
+                showPayoutSuccess(catchReward);
+                fetchUserBalance();
+            } else {
+                moveButton();
+            }
+        };
+    }, 50);
 }
 
 function moveButton() {
