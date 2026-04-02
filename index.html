@@ -830,7 +830,7 @@
                         <span class="task-reward-badge">+150 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/channel1', '-1003781233683', 150)">Открыть</button>
+                <button id="task1Btn" class="task-btn-action"onclick="handleSubscriptionTask('https://t.me/channel1', '-1003781233683', 150)">Открыть</button>
             </div>
 
             <div class="task-entry">
@@ -841,29 +841,18 @@
                         <span class="task-reward-badge">+200 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/channel2', '-1003781233682', 200)">Открыть</button>
+                <button id="task2Btn" class="task-btn-action"onclick="handleSubscriptionTask('https://t.me/channel2', '-1003781233682', 200)">Открыть</button>
             </div>
 
             <div class="task-entry">
                 <div class="task-left-side">
-                    <div class="task-visual-icon">🎬</div>
+                    <div class="task-visual-icon">🤖</div>
                     <div class="task-body-content">
-                        <span class="task-name-label">Просмотр рекламы</span>
+                        <span class="task-name-label">Проверка Captcha</span>
                         <span class="task-reward-badge">+125 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="startCaptcha(125)">пройти</button>
-            </div>
-
-            <div class="task-entry">
-                <div class="task-left-side">
-                    <div class="task-visual-icon">🎁</div>
-                    <div class="task-body-content">
-                        <span class="task-name-label">Пригласить 3 друга</span>
-                        <span class="task-reward-badge">+15.00 ₴</span>
-                    </div>
-                </div>
-                <button class="task-btn-action" onclick="tg.showAlert('Отправьте инвайт-ссылку друзьям!')">Позвать</button>
+                <button id="captchaBtn" class="task-btn-action"onclick="startCaptcha(125)">пройти</button>
             </div>
 
             <div class="task-entry">
@@ -874,7 +863,7 @@
                         <span class="task-reward-badge">+300 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="handleSubscriptionTask('https://t.me/+oJYwxIoOJ3wzNzBk', '-1003781233681', 300)">Открыть</button>
+                <button id="taskVipBtn" class="task-btn-action"onclick="handleSubscriptionTask('https://t.me/+oJYwxIoOJ3wzNzBk', '-1003781233681', 300)">Открыть</button>
             </div>
 
             <div class="task-entry task-premium-gold">
@@ -897,7 +886,7 @@
             <div style="font-size: 36px; font-weight: 950; color: var(--ios-success); margin-bottom: 10px;">
                 <span class="wallet-sync-bal">0.00</span> ₴
             </div>
-            <p style="font-size: 14px; color: var(--ios-text-hint);">Минимальная сумма вывода: 100.00 ₴</p>
+            <p style="font-size: 14px; color: var(--ios-text-hint);">Минимальная сумма вывода: 1200 ₴</p>
         </div>
 
         <div class="section-label-header">Методы выплаты</div>
@@ -906,7 +895,7 @@
             <div class="task-visual-icon" style="background: rgba(10, 132, 255, 0.1); color: var(--ios-accent);">💳</div>
             <div style="flex: 1;">
                 <div style="font-weight: 700; font-size: 17px;">Банковская карта</div>
-                <div style="font-size: 13px; color: var(--ios-text-hint);">UA / СНГ / WORLD</div>
+                <div style="font-size: 13px; color: var(--ios-text-hint);">UA | VISA/MASTER</div>
             </div>
             <div style="color: var(--ios-text-hint); font-size: 20px;">›</div>
         </div>
@@ -961,7 +950,7 @@
         <input type="text" class="modal-input-field" placeholder="0000 0000 0000 0000">
         
         <div style="margin-bottom: 10px; font-size: 14px; color: var(--ios-text-hint);">Сумма к получению (₴):</div>
-        <input type="number" class="modal-input-field" placeholder="Мин. 100">
+        <input type="number" class="modal-input-field" placeholder="Мин. 1200">
 
         <p style="font-size: 12px; color: var(--ios-text-hint); margin-bottom: 20px;">
             * Зачисление происходит в течение 24 часов. Комиссия составляет 2%.
@@ -1472,6 +1461,17 @@ fetch(`${API_ENDPOINT}/complete_captcha`, {
 
 function closeCaptcha() {
     document.getElementById('captchaModal').style.display = 'none';
+}
+
+// 🔥 ВСТАВЬ ВОТ СЮДА
+function disableTaskButton(btnId, text = "Выполнено") {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    btn.innerText = text;
+    btn.disabled = true;
+    btn.style.background = "#3a3a3c";
+    btn.style.color = "#8e8e93";
 }
 </script>
 <div id="payoutSuccessModal" class="modal-overlay" style="display: none;">
