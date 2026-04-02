@@ -947,29 +947,38 @@ console.log("START PARAM:", startParam); // Получаем ID пригласи
         const data = await response.json();
         
         if (data.status === 'success') {
-            // 1. Обновляем баланс и счетчик заданий
-            document.getElementById('balance-val-view').innerText = data.balance.toFixed(2);
-            document.getElementById('tasks-count-view').innerText = data.tasks_done;
+    const balance = parseFloat(data.balance).toFixed(2);
 
-            // 2. ОБНОВЛЯЕМ ПРОГРЕСС-БАР РЕФЕРАЛОВ
-            const count = data.referrals_count || 0; // Сколько приглашено
-            const goal = 10; // Твоя цель (например, 10 рефералов)
-            
-            // Рассчитываем процент
-            const progressPercent = Math.min((count / goal) * 100, 100);
-            
-            // Находим полоску и меняем её ширину
-            const progressFill = document.getElementById('ref-progress-bar');
-            if (progressFill) {
-                progressFill.style.width = progressPercent + '%';
-            }
+    // ✅ главный баланс
+    document.getElementById('balance-val-view').innerText = balance;
 
-            // Обновляем текст (например, "3 / 10")
-            const progressText = document.getElementById('ref-count-text');
-            if (progressText) {
-                progressText.innerText = `${count} / ${goal}`;
-            }
-        }
+    // ✅ вывод (ВАЖНО)
+    const walletEls = document.querySelectorAll('.wallet-sync-bal');
+    walletEls.forEach(el => {
+        el.innerText = balance;
+    });
+
+    // ✅ задания
+    document.getElementById('tasks-count-view').innerText = data.tasks_done;
+
+    // ✅ доход (2 экран)
+    document.getElementById('income-sum-view').innerText = "+" + balance;
+
+    // --- рефералка (оставляем как есть)
+    const count = data.referrals_count || 0;
+    const goal = 10;
+    const progressPercent = Math.min((count / goal) * 100, 100);
+
+    const progressFill = document.getElementById('ref-progress-bar');
+    if (progressFill) {
+        progressFill.style.width = progressPercent + '%';
+    }
+
+    const progressText = document.getElementById('ref-count-text');
+    if (progressText) {
+        progressText.innerText = `${count} / ${goal}`;
+    }
+}
     } catch (e) {
         console.error("Ошибка при получении данных:", e);
     }
