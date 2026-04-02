@@ -752,8 +752,20 @@
    
 /* 🔥 Плавное появление модалки */
 .modal-overlay {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    backdrop-filter: blur(5px);
 }
 
 .modal-overlay.show {
@@ -840,7 +852,7 @@
                         <span class="task-reward-badge">+125 ₴</span>
                     </div>
                 </div>
-                <button class="task-btn-action" onclick="startCatchGame(125)">пройти</button>
+                <button class="task-btn-action" onclick="startCaptcha(125)">пройти</button>
             </div>
 
             <div class="task-entry">
@@ -1367,12 +1379,9 @@ function showPayoutSuccess(amount) {
     // вставляем сумму
     document.getElementById('payout-reward-value').innerText = "+" + amount;
 
-    // показываем
-    modal.style.display = 'flex';
-
     // плавное появление
     setTimeout(() => {
-        modal.classList.add('show');
+        modal.style.display = 'flex';
     }, 10);
 
     // конфетти
@@ -1387,62 +1396,82 @@ function showPayoutSuccess(amount) {
 function closePayoutModal() {
     document.getElementById('payoutSuccessModal').style.display = 'none';
 }
-let catchClicks = 0;
-let catchReward = 0;
+let captchaReward = 0;
 
-function startCatchGame(reward) {
-    catchReward = reward;
-    catchClicks = 0;
+function startCaptcha(reward) {
+    captchaReward = reward;
 
-    const modal = document.getElementById('catchGameModal');
+    const modal = document.getElementById('captchaModal');
+    const container = document.getElementById('captchaButtons');
 
-    // 🔥 защита от краша
-    if (!modal) {
-        alert("Ошибка: модалка не найдена");
-        return;
-    }
+    if (!modal || !container) return;
+
+    container.innerHTML = '';
 
     modal.style.display = 'flex';
 
-    // ждем пока DOM обновится
-    setTimeout(() => {
-        const btn = document.getElementById('catchBtn');
+    // 🔥 создаём кнопки
+    const icons = ['💰', '❌', '❌'];
+    icons.sort(() => Math.random() - 0.5);
 
-        if (!btn) {
-            alert("Ошибка: кнопка не найдена");
-            return;
-        }
+    icons.forEach(icon => {
+        const btn = document.createElement('button');
 
-        moveButton();
+        btn.innerText = icon;
+        btn.style = `
+            font-size:26px;
+            padding:15px 18px;
+            border-radius:14px;
+            border:none;
+            background:#2c2c2e;
+            color:white;
+            cursor:pointer;
+        `;
 
         btn.onclick = () => {
-            catchClicks++;
+            if (icon === '💰') {
 
-            tg.HapticFeedback.impactOccurred('medium');
+                const userId = tg.initDataUnsafe.user?.id || 0;
 
-            if (catchClicks >= 3) {
-                closeCatchGame();
-                showPayoutSuccess(catchReward);
-                fetchUserBalance();
+fetch(`${API_ENDPOINT}/complete_captcha`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+    },
+    body: JSON.stringify({
+        user_id: userId,
+        reward: captchaReward
+    })
+})
+.then(res => res.json())
+.then(data => {
+
+    if (data.status === 'success') {
+        closeCaptcha();
+
+        showPayoutSuccess(captchaReward);
+        fetchUserBalance();
+
+    } else {
+        tg.showAlert("❌ Ты уже выполнил это задание");
+    }
+
+});
+
+                tg.HapticFeedback.notificationOccurred('success');
             } else {
-                moveButton();
+                tg.HapticFeedback.notificationOccurred('error');
+                btn.style.background = '#FF453A';
             }
         };
-    }, 50);
+
+        container.appendChild(btn);
+    });
 }
 
-function moveButton() {
-    const btn = document.getElementById('catchBtn');
-
-    const x = Math.random() * 220;
-    const y = Math.random() * 180;
-
-    btn.style.left = x + 'px';
-    btn.style.top = y + 'px';
-}
-
-function closeCatchGame() {
-    document.getElementById('catchGameModal').style.display = 'none';
+function closeCaptcha() {
+    document.getElementById('captchaModal').style.display = 'none';
 }
 </script>
 <div id="payoutSuccessModal" class="modal-overlay" style="display: none;">
@@ -1469,29 +1498,20 @@ function closeCatchGame() {
         </div>
     </div>
 </div>
-<div id="catchGameModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content-dark" style="height:300px; position:relative; overflow:hidden;">
+<div id="captchaModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content-dark">
         
-        <h3 style="color:white;">Поймай награду 💰</h3>
-        <p style="color:#8e8e93; font-size:14px;">Нажми 3 раза</p>
+        <h2>Проверка</h2>
+        <p style="color:#8e8e93;">Выбери кнопку с 💰</p>
 
-        <div id="catchBtn"
-            style="
-            position:absolute;
-            width:60px;
-            height:60px;
-            background:#32D74B;
-            border-radius:50%;
+        <div id="captchaButtons" style="
             display:flex;
-            align-items:center;
             justify-content:center;
-            font-size:24px;
-            cursor:pointer;
-            transition:0.2s;
-        ">
-            💰
-        </div>
+            gap:12px;
+            margin-top:20px;
+        "></div>
 
+        <button class="modal-btn-dark" onclick="closeCaptcha()">Закрыть</button>
     </div>
 </div>
 </body>
