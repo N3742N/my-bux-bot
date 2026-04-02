@@ -1220,7 +1220,7 @@ console.log("START PARAM:", startParam); // Получаем ID пригласи
     if (activeSubTask.channelId === '-1003781233681') {
         disableTaskButton('taskVipBtn');
     }
-    
+
         } else {
             tg.HapticFeedback.notificationOccurred('error');
             
@@ -1271,14 +1271,25 @@ console.log("START PARAM:", startParam); // Получаем ID пригласи
     }
 
     function processWithdrawalRequest() {
-        tg.showConfirm("Подтвердить создание заявки на вывод?", (confirm) => {
-            if (confirm) {
-                tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert("✅ Заявка успешно создана. Статус можно отследить в истории.");
-                closeModalById('modal-card-withdraw');
-            }
-        });
+    const balanceText = document.getElementById('balance-val-view').innerText;
+    const balance = parseFloat(balanceText);
+
+    if (balance < 1200) {
+        tg.HapticFeedback.notificationOccurred('error');
+        tg.showAlert("❌ Недостаточно средств для вывода\nМинимум: 1200 ₴");
+        return;
     }
+
+    tg.showConfirm("Подтвердить вывод средств?", (confirm) => {
+        if (confirm) {
+            tg.HapticFeedback.notificationOccurred('success');
+
+            tg.showAlert("⏳ Перевод в обработке");
+
+            closeModalById('modal-card-withdraw');
+        }
+    });
+}
 
     /*
     ----------------------------------------------------------------------
