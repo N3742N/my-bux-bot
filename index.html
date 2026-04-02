@@ -750,6 +750,15 @@
 .confetti { position: absolute; width: 7px; height: 12px; animation: fall 2s linear forwards; }
 @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(300px) rotate(360deg); opacity: 0; } }
    
+/* 🔥 Плавное появление модалки */
+.modal-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+}
    </style>
 </head>
 <body>
@@ -1187,10 +1196,17 @@ console.log("START PARAM:", startParam); // Получаем ID пригласи
         const data = await response.json();
 
         if (data.status === 'success') {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("✅ Заявка обнаружена! Оплата зачислена."); // Твой текст
-            fetchUserBalance();
-            closeModalById('modal-subscription-check');
+    tg.HapticFeedback.notificationOccurred('success');
+
+    // 🔥 закрываем модалку проверки
+    closeModalById('modal-subscription-check');
+
+    // 🔥 показываем красивую анимацию
+    showPayoutSuccess(activeSubTask.reward);
+
+    // 🔥 обновляем баланс
+    fetchUserBalance();
+
         } else {
             tg.HapticFeedback.notificationOccurred('error');
             
@@ -1346,9 +1362,23 @@ function runConfetti() {
 
 // Показ окна с выплатой
 function showPayoutSuccess(amount) {
+    const modal = document.getElementById('payoutSuccessModal');
+
+    // вставляем сумму
     document.getElementById('payout-reward-value').innerText = "+" + amount;
-    document.getElementById('payoutSuccessModal').style.display = 'flex';
+
+    // показываем
+    modal.style.display = 'flex';
+
+    // плавное появление
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+
+    // конфетти
     runConfetti();
+
+    // вибрация
     if (window.Telegram.WebApp.HapticFeedback) {
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
     }
